@@ -9,7 +9,7 @@ const Editor: FunctionComponent<Editor> = ({ lines }) => {
     '--max-width': '80ch',
     '--line-height': '24px',
     '--font-size': '18px',
-    '--font-family': 'monospace'
+    '--font-family': 'monospace',
   } as CSSProperties
 
   return (
