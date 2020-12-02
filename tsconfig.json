@@ -1,9 +1,7 @@
 {
   "compilerOptions": {
     "jsx": "react",
-    "baseUrl": "./",
-    "paths": {
-      "@components/*": ["src/renderer/components/*"]
-    }
+    "esModuleInterop": true,
+    "moduleResolution": "node"
   }
 }

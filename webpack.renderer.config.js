@@ -8,10 +8,6 @@ const renderer = {
   target: 'web',
   resolve: {
     extensions: ['.tsx', '.scss'],
-    alias: {
-      '@styles': path.resolve(__dirname, 'src/renderer/styles'),
-      '@components': path.resolve(__dirname, 'src/renderer/components'),
-    },
   },
   output: {
     path: path.resolve(__dirname, 'build/renderer'),

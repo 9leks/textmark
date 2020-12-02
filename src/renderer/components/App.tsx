@@ -1,7 +1,24 @@
-import * as React from 'react'
+import React, { FunctionComponent } from 'react'
 
-const App = () => {
-  return <div>Hello!</div>
+type App = {
+  file: string
+  contents: string[]
+}
+
+const App: FunctionComponent<App> = ({ file, contents }) => {
+  return (
+    <div>
+      <b>filename</b>: <div>{file}.</div>
+      <b>contents:</b>{' '}
+      <div>
+        {contents.map((line, i) => (
+          <div key={i}>
+            {i} {line}
+          </div>
+        ))}
+      </div>
+    </div>
+  )
 }
 
 export default App

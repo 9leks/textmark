@@ -1,7 +1,12 @@
-import * as React from 'react'
+import React from 'react'
 import { render } from 'react-dom'
 
-import '@styles/index'
-import App from '@components/App'
+import './styles/index'
+import App from './components/App'
 
-render(<App />, document.getElementById('app'))
+window.main.onReady((file: string, contents: string[]) => {
+  render(
+    <App file={file} contents={contents} />,
+    document.getElementById('app')
+  )
+})
