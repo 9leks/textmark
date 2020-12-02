@@ -15,10 +15,11 @@ body {
   .line {
     display: flex;
     position: relative;
-    font-family: Iosevka, Monaco, Menlo, Consolas, "Droid Sans Mono", monospace;
-    font-size: 19px;
-    line-height: 24px;
+    font-family: var(--font-family);
+    font-size: var(--font-size);
+    line-height: var(--line-height);
     counter-increment: list;
+
     .line-number {
       margin-right: 1em;
       color: #888;
@@ -26,6 +27,8 @@ body {
     }
 
     .line-text {
+      max-width: var(--max-width);
+      padding-left: 1px;
       outline: none;
     }
   }

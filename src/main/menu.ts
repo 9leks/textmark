@@ -10,10 +10,6 @@ export default function getTemplate(): MenuItemConstructorOptions[] {
           accelerator: 'CmdorCtrl+N',
         },
         {
-          label: 'New Tab',
-          accelerator: 'CmdorCtrl+T',
-        },
-        {
           type: 'separator',
         },
         {
@@ -42,11 +38,11 @@ export default function getTemplate(): MenuItemConstructorOptions[] {
           type: 'separator',
         },
         {
-          label: 'Close Tab',
+          label: 'Close Window',
           accelerator: 'CmdorCtrl+W',
         },
         {
-          label: 'Reopen Closed Tab',
+          label: 'Reopen Closed Window',
           accelerator: 'Shift+CmdorCtrl+T',
         },
       ],

@@ -3,7 +3,7 @@ export {}
 declare global {
   interface Window {
     main: {
-      onReady: (cb: (file: string, contents: string[][]) => void) => void
+      onReady: (cb: (lines: string[]) => void) => void
     }
   }
 }

@@ -2,11 +2,8 @@ import React from 'react'
 import { render } from 'react-dom'
 
 import './styles/index'
-import App from './components/App'
+import Editor from './components/Editor'
 
-window.main.onReady((file: string, contents: string[][]) => {
-  render(
-    <App file={file} contents={contents} />,
-    document.getElementById('app')
-  )
+window.main.onReady((lines: string[]) => {
+  render(<Editor lines={lines} />, document.getElementById('app'))
 })
