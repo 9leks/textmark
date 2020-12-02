@@ -2,7 +2,7 @@ import path from 'path'
 import { app, session, BrowserWindow, Menu } from 'electron'
 import Store from 'electron-store'
 import contextMenu from 'electron-context-menu'
-import getTemplate  from './menu'
+import getTemplate from './menu'
 
 contextMenu()
 let win: BrowserWindow | null

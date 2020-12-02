@@ -13,7 +13,7 @@ function split(text: string, width = 80): string[][] {
       return [line]
     }
 
-    return line.match(new RegExp(`\\b.{1,${width}}\\b`, 'g'))
+    return line.match(new RegExp(`.{1,${width}}(?=\\b.*\\b)\\.?`, 'g'))
   })
 }
 
