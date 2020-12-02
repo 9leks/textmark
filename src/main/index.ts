@@ -1,7 +1,9 @@
 import path from 'path'
 import { app, session, BrowserWindow } from 'electron'
 import Store from 'electron-store'
+import contextMenu from 'electron-context-menu'
 
+contextMenu()
 let win: BrowserWindow | null
 let store: Store | null
 
@@ -11,7 +13,9 @@ app.on('ready', () => {
     height: 800,
     x: 1900,
     y: 750,
+
     webPreferences: {
+      spellcheck: false,
       sandbox: true,
       contextIsolation: true,
       preload: path.resolve(__dirname, 'preload.js'),
