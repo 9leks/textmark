@@ -4,6 +4,10 @@ const base = require('./webpack.base.config.js')
 const CopyPlugin = require('copy-webpack-plugin')
 const ElectronReloaderPlugin = require('electron-reloader-webpack-plugin')
 
+const electronReloader = new ElectronReloaderPlugin('electron', [
+  path.resolve(__dirname, 'build/main/index.js'),
+])
+
 const main = {
   entry: path.resolve(__dirname, 'src/main/index.ts'),
   target: 'electron-main',
@@ -21,9 +25,7 @@ const main = {
         },
       ],
     }),
-    new ElectronReloaderPlugin('electron', [
-      path.resolve(__dirname, 'build/main/index.js'),
-    ]),
+    electronReloader,
   ],
 }
 
@@ -34,11 +36,7 @@ const preload = {
     path: path.resolve(__dirname, 'build/main'),
     filename: 'preload.js',
   },
-  plugins: [
-    new ElectronReloaderPlugin('electron', [
-      path.resolve(__dirname, 'build/main/index.js'),
-    ]),
-  ],
+  plugins: [electronReloader],
 }
 
 module.exports = [merge(base, main), merge(base, preload)]

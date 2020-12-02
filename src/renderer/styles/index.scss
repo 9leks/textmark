@@ -2,5 +2,25 @@ html,
 body {
   margin: 0;
   padding: 0;
-  font-family: Arial, Helvetica, sans-serif;
+  background: rgb(13, 16, 27);
+  color: #e6e6e6;
+  font-family: Monaco, Menlo, Consolas, "Droid Sans Mono", monospace;
+  font-size: 16px;
+}
+
+.lines {
+  padding: 1.5em;
+
+  .line {
+    display: flex;
+    position: relative;
+    line-height: 24px;
+    counter-increment: list;
+
+    .line-number {
+      margin-right: 1em;
+      color: #888;
+      user-select: none;
+    }
+  }
 }
