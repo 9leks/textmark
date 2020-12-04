@@ -8,6 +8,6 @@ const dummy = {
 
 contextBridge.exposeInMainWorld('main', {
   onReady: (cb: (lines: string[]) => void) => {
-    cb(dummy.text.split('\n'))
+    cb(dummy.text.split('\n').map(line => !line ? '\u200c' : line ))
   },
 })

@@ -5,5 +5,5 @@ import './styles/index'
 import Editor from './components/Editor'
 
 window.main.onReady((lines: string[]) => {
-  render(<Editor lines={lines} />, document.getElementById('app'))
+  render(<Editor initialLines={lines} />, document.getElementById('app'))
 })

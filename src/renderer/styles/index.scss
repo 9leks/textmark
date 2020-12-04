@@ -9,26 +9,28 @@ body {
 }
 
 .lines {
-  padding: 1.5em;
+  display: flex;
+  flex-direction: column;
+  padding-top: 0.75em;
   outline: none;
+  list-style: none;
 
   .line {
-    display: flex;
-    position: relative;
     font-family: var(--font-family);
     font-size: var(--font-size);
     line-height: var(--line-height);
-    counter-increment: list;
+    counter-increment: custom;
 
-    .line-number {
-      margin-right: 1em;
+    &:before {
+      content: counter(custom) " ";
+      margin-left: -1.3em;
       color: #888;
       user-select: none;
     }
 
     .line-text {
       max-width: var(--max-width);
-      padding-left: 1px;
+      margin-left: 1px;
       outline: none;
     }
   }
