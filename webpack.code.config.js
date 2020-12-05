@@ -5,23 +5,23 @@ const CopyPlugin = require('copy-webpack-plugin')
 const ElectronReloaderPlugin = require('electron-reloader-webpack-plugin')
 
 const electronReloader = new ElectronReloaderPlugin('electron', [
-  path.resolve(__dirname, 'build/main/index.js'),
+  path.resolve(__dirname, 'build/code/main.js'),
 ])
 
 const main = {
-  entry: path.resolve(__dirname, 'src/main/index.ts'),
+  entry: path.resolve(__dirname, 'src/code/main.ts'),
   target: 'electron-main',
   watch: true,
   output: {
-    path: path.resolve(__dirname, 'build/main'),
-    filename: 'index.js',
+    path: path.resolve(__dirname, 'build/code'),
+    filename: 'main.js',
   },
   plugins: [
     new CopyPlugin({
       patterns: [
         {
-          from: path.resolve(__dirname, 'src/main/lib/devtools'),
-          to: path.resolve(__dirname, 'build/main/lib/devtools'),
+          from: path.resolve(__dirname, 'src/code/lib/devtools'),
+          to: path.resolve(__dirname, 'build/code/lib/devtools'),
         },
       ],
     }),
@@ -30,10 +30,10 @@ const main = {
 }
 
 const preload = {
-  entry: path.resolve(__dirname, 'src/main/preload.ts'),
+  entry: path.resolve(__dirname, 'src/code/preload.ts'),
   target: 'electron-preload',
   output: {
-    path: path.resolve(__dirname, 'build/main'),
+    path: path.resolve(__dirname, 'build/code'),
     filename: 'preload.js',
   },
   plugins: [electronReloader],

@@ -3,9 +3,9 @@
   "version": "0.0.1",
   "license": "MIT",
   "scripts": {
-    "serve:main": "webpack --config webpack.main.config.js",
-    "serve:renderer": "webpack-dev-server --config webpack.renderer.config.js",
-    "start": "concurrently \"npm run serve:main\" \"npm run serve:renderer\""
+    "serve:code": "webpack --config webpack.code.config.js",
+    "serve:editor": "webpack-dev-server --config webpack.editor.config.js",
+    "start": "concurrently \"npm run serve:code\" \"npm run serve:editor\""
   },
   "dependencies": {
     "electron-store": "^6.0.1",
@@ -14,9 +14,11 @@
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",
+    "@babel/plugin-transform-runtime": "^7.12.1",
     "@babel/preset-env": "^7.12.7",
     "@babel/preset-react": "^7.12.7",
     "@babel/preset-typescript": "^7.12.7",
+    "@babel/runtime": "^7.12.5",
     "@types/react": "^17.0.0",
     "@types/react-dom": "^17.0.0",
     "@types/webpack-env": "^1.16.0",

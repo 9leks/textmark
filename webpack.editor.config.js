@@ -3,18 +3,18 @@ const { merge } = require('webpack-merge')
 const path = require('path')
 const base = require('./webpack.base.config.js')
 
-const renderer = {
-  entry: path.resolve(__dirname, 'src/renderer/index.tsx'),
+const editor = {
+  entry: path.resolve(__dirname, 'src/editor/index.tsx'),
   target: 'web',
   resolve: {
     extensions: ['.tsx', '.scss'],
   },
   output: {
-    path: path.resolve(__dirname, 'build/renderer'),
+    path: path.resolve(__dirname, 'build/editor'),
     filename: 'index.js',
   },
   devServer: {
-    static: path.resolve(__dirname, 'build/renderer'),
+    static: path.resolve(__dirname, 'build/editor'),
     port: 4000,
   },
   module: {
@@ -27,9 +27,9 @@ const renderer = {
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: path.resolve(__dirname, 'src/renderer/index.html'),
+      template: path.resolve(__dirname, 'src/editor/index.html'),
     }),
   ],
 }
 
-module.exports = merge(base, renderer)
+module.exports = merge(base, editor)
