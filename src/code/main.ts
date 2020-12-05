@@ -1,19 +1,32 @@
 import path from 'path'
-import { app, session, BrowserWindow, Menu } from 'electron'
-import Store from 'electron-store'
+import {
+  app,
+  session,
+  BrowserWindow,
+  Menu,
+  screen,
+  webContents,
+} from 'electron'
+import ElectronStore from 'electron-store'
 import contextMenu from 'electron-context-menu'
 import getTemplate from './menu'
 
-contextMenu()
 let win: BrowserWindow | null
-let store: Store | null
+let store: ElectronStore | null
 
 app.on('ready', () => {
+  contextMenu()
+
+  const displays = screen.getAllDisplays()
+  const externalDisplay = displays.find(display => {
+    return display.bounds.x !== 0 || display.bounds.y !== 0
+  })
+
   win = new BrowserWindow({
     width: 1000,
     height: 800,
-    x: 1900,
-    y: 750,
+    x: externalDisplay.bounds.x + 800,
+    y: externalDisplay.bounds.y + 200,
 
     webPreferences: {
       spellcheck: false,
@@ -25,9 +38,12 @@ app.on('ready', () => {
 
   win.webContents.on('did-frame-finish-load', () => {
     win.webContents.openDevTools({ mode: 'detach' })
+    win.webContents.on('devtools-opened', () => {
+      win.focus()
+    })
   })
 
-  store = new Store()
+  store = new ElectronStore()
   store.clear()
 
   Menu.setApplicationMenu(Menu.buildFromTemplate(getTemplate()))
