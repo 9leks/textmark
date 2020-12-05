@@ -13,7 +13,7 @@ type Editor = {
 }
 
 const Editor: FunctionComponent<Editor> = ({ initialLines }) => {
-  const [lines, setLines] = useState(initialLines)
+  const [lines, setLines] = useState(initialLines.map(line => `${line}\u2800`))
   const [cursor, setCursor] = useState({ x: 0, y: 0 })
   const textAreaRef = useRef()
   const linesRef = useRef()
@@ -49,7 +49,7 @@ const Editor: FunctionComponent<Editor> = ({ initialLines }) => {
 
       const editor = linesRef.current as HTMLDivElement
       const line = editor.childNodes[y].lastChild.textContent
-      const text = textArea.value
+      const text = textArea.value === ' ' ? '\u00a0' : textArea.value
       const copy = [...prev]
 
       copy[y] = [line.slice(0, x), text, line.slice(x)].join('')
@@ -68,27 +68,24 @@ const Editor: FunctionComponent<Editor> = ({ initialLines }) => {
     switch (e.key) {
       case 'ArrowDown': {
         if (y === children.length - 1) {
-          const nextLine = children[y].lastChild.textContent
-          setCursor({ x: nextLine.length, y })
-        } else {
-          const nextLine = children[y + 1].lastChild.textContent
-          setCursor({
-            x: x > nextLine.length - 1 ? nextLine.length : x,
-            y: y + 1,
-          })
+          return
         }
+        const nextLine = children[y + 1].lastChild.textContent
+        setCursor({
+          x: x > nextLine.length - 1 ? nextLine.length - 1 : x,
+          y: y + 1,
+        })
         return
       }
       case 'ArrowUp': {
         if (y === 0) {
-          setCursor({ x: 0, y })
-        } else {
-          const nextLine = children[y - 1].lastChild.textContent
-          setCursor({
-            x: x > nextLine.length - 1 ? nextLine.length : x,
-            y: y - 1,
-          })
+          return
         }
+        const nextLine = children[y - 1].lastChild.textContent
+        setCursor({
+          x: x > nextLine.length - 1 ? nextLine.length - 1 : x,
+          y: y - 1,
+        })
         return
       }
       case 'ArrowLeft': {
@@ -97,7 +94,7 @@ const Editor: FunctionComponent<Editor> = ({ initialLines }) => {
             return
           }
           const nextLine = children[y - 1].lastChild.textContent
-          setCursor({ x: nextLine.length, y: y - 1 })
+          setCursor({ x: nextLine.length - 1, y: y - 1 })
         } else {
           setCursor({ x: x - 1, y })
         }
@@ -105,7 +102,7 @@ const Editor: FunctionComponent<Editor> = ({ initialLines }) => {
       }
       case 'ArrowRight': {
         const currLine = children[y].lastChild.textContent
-        if (x === currLine.length) {
+        if (x === currLine.length - 1) {
           if (y == children.length - 1) {
             return
           }

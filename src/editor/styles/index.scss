@@ -44,6 +44,7 @@ body {
 }
 
 .editor-line-content-char {
+  position: relative;
   &[data-focus="true"] {
     animation: blink 1s infinite;
   }
@@ -53,10 +54,10 @@ body {
   0%,
   49.9%,
   100% {
-    background: rgba(255, 255, 255, 0.5);
+    box-shadow: -1px 0px 0px 0px #eee;
   }
   50%,
   99.9% {
-    background: rgba(0, 0, 0, 0);
+    box-shadow: -1px 0px 0px 0px transparent;
   }
 }
