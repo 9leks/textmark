@@ -1,12 +1,5 @@
 import path from 'path'
-import {
-  app,
-  session,
-  BrowserWindow,
-  Menu,
-  screen,
-  webContents,
-} from 'electron'
+import { app, session, BrowserWindow, Menu, screen } from 'electron'
 import ElectronStore from 'electron-store'
 import contextMenu from 'electron-context-menu'
 import getTemplate from './menu'
