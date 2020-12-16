@@ -1,11 +1,7 @@
 {
   "plugins": ["stylelint-order", "stylelint-prettier"],
-  "extends": [
-    "stylelint-config-property-sort-order-smacss",
-    "stylelint-config-prettier"
-  ],
+  "extends": ["stylelint-config-property-sort-order-smacss", "stylelint-config-prettier"],
   "rules": {
-    "prettier/prettier": true,
-    "string-quotes": "double"
+    "prettier/prettier": [true, { "singleQuote": false }]
   }
 }
