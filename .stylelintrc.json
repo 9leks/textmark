@@ -3,6 +3,7 @@
   "plugins": ["stylelint-order", "stylelint-prettier"],
   "extends": [
     "stylelint-config-property-sort-order-smacss",
+    "stylelint-config-recommended",
     "stylelint-config-prettier",
     "stylelint-config-styled-components"
   ],

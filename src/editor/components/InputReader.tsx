@@ -1,29 +1,59 @@
-import React, { Dispatch, FormEvent, FunctionComponent, useEffect, useRef } from 'react'
+import React, { Dispatch, FunctionComponent, KeyboardEvent, SetStateAction, useEffect, useRef } from 'react'
 import styled from 'styled-components'
 
 type Reader = {
-  readInput: (input: string) => void
-  initInputReader: Dispatch<unknown>
-
+  setLines: Dispatch<SetStateAction<string[]>>
+  cursor: { x: number; y: number }
+  setCursor: Dispatch<SetStateAction<{ x: number; y: number }>>
+  setReaderRef: Dispatch<unknown>
 }
 
-const InputReader: FunctionComponent<Reader> = ({ readInput, initInputReader }) => {
-  const inputReaderRef = useRef(null)
+const AppReader: FunctionComponent<Reader> = ({ cursor, setCursor, setLines, setReaderRef }) => {
+  const readerRef = useRef(null)
 
-  useEffect(() => { 
-    initInputReader(inputReaderRef)
+  useEffect(() => {
+    setReaderRef(readerRef)
   }, [])
 
-  const handleInput = (evt: FormEvent) => {
+  const handleKeyDown = (evt: KeyboardEvent) => {
+    switch (evt.key) {
+      case 'Enter': {
+        console.log('Pressed', evt.key)
+        return
+      }
+      case 'Backspace': {
+        console.log('Pressed', evt.key)
+        return
+      }
+      case 'LeftArrow': {
+        console.log('Pressed', evt.key)
+        return
+      }
+      case 'RightArrow': {
+        console.log('Pressed', evt.key)
+        return
+      }
+      case 'UpArrow': {
+        console.log('Pressed', evt.key)
+        return
+      }
+      case 'DownArrow': {
+        console.log('Pressed', evt.key)
+        return
+      }
+      default: {
+        console.log('Pressed', evt.key)
+      }
+    }
+
     const target = evt.target as HTMLTextAreaElement
-    readInput(target.value)
     target.value = ''
   }
 
-  return <TextArea onInput={handleInput} autoFocus ref={inputReaderRef} />
+  return <TextArea onKeyDown={handleKeyDown} autoFocus ref={readerRef} />
 }
 
-export default InputReader
+export default AppReader
 
 const TextArea = styled.textarea`
   position: absolute;

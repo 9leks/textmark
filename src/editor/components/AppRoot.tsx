@@ -1,5 +1,4 @@
-import React, { FunctionComponent, useState } from 'react'
-import styled from 'styled-components'
+import React, { Fragment, FunctionComponent, useState } from 'react'
 import AppEditor from './AppEditor'
 import InputReader from './InputReader'
 
@@ -9,20 +8,15 @@ type Root = {
 
 const AppRoot: FunctionComponent<Root> = ({ initialLines }) => {
   const [lines, setLines] = useState(initialLines)
-  const [inputHandlerRef, initInputReader] = useState(null)
-
-  const readInput = (input: string) => {
-    setLines(old => [...old, input])
-  }
+  const [cursor, setCursor] = useState({ x: 0, y: 0 })
+  const [readerRef, setReaderRef] = useState(null)
 
   return (
-    <Container>
-      <InputReader readInput={readInput} initInputReader={initInputReader} />
-      <AppEditor lines={lines} inputHandlerRef={inputHandlerRef} />
-    </Container>
+    <Fragment>
+      <InputReader setLines={setLines} cursor={cursor} setCursor={setCursor} setReaderRef={setReaderRef} />
+      <AppEditor lines={lines} cursor={cursor} setCursor={setCursor} readerRef={readerRef} />
+    </Fragment>
   )
 }
 
 export default AppRoot
-
-const Container = styled.span``

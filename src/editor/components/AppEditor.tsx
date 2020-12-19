@@ -1,40 +1,44 @@
-import React, { FunctionComponent, MutableRefObject, MouseEvent, useState } from 'react'
+import React, { FunctionComponent, MutableRefObject, MouseEvent, Dispatch, SetStateAction } from 'react'
 import styled, { css, keyframes } from 'styled-components'
 
 type Editor = {
   lines: string[]
-  inputHandlerRef: MutableRefObject<HTMLTextAreaElement>
+  cursor: { x: number; y: number }
+  setCursor: Dispatch<SetStateAction<{ x: number; y: number }>>
+  readerRef: MutableRefObject<HTMLTextAreaElement>
 }
 
-const AppEditor: FunctionComponent<Editor> = ({ lines, inputHandlerRef }) => {
-  const [coords, setCoords] = useState({ x: 0, y: 0 })
-
+const AppEditor: FunctionComponent<Editor> = ({ lines, cursor, setCursor, readerRef }) => {
   const handleClick = (evt: MouseEvent) => {
-    inputHandlerRef.current.focus()
+    readerRef.current.focus()
 
-    const character = evt.target as HTMLSpanElement
+    const target = evt.target as HTMLDivElement | HTMLSpanElement
 
-    if (character.parentElement.hasAttribute('data-line')) {
-      const x = Number(character.getAttribute('data-char-index'))
-      const y = Number(character.getAttribute('data-line-number'))
-      setCoords({ x, y })
+    if (target instanceof HTMLDivElement) {
+      const y = Number(target.getAttribute('data-line-number'))
+      const x = lines[y].length - 1
+      setCursor({ x, y })
+    } else if (target instanceof HTMLSpanElement) {
+      const y = Number(target.getAttribute('data-line-number'))
+      const x = Number(target.getAttribute('data-char-index'))
+      setCursor({ x, y })
     }
   }
 
   return (
     <Container onClick={handleClick}>
-      {coords.x}:{coords.y}
+      {cursor.x}:{cursor.y}
       {lines.map((line, lineNumber) => (
-        <Line key={lineNumber}>
-          <LineNumber data-number>{lineNumber}</LineNumber>
-          <LineText data-line>
+        <Line key={lineNumber} onClick={handleClick} data-line-number={lineNumber}>
+          <LineNumber>{lineNumber}</LineNumber>
+          <LineText data-line-number={lineNumber}>
             {[...line].map((char, charIndex) => (
               <Character
                 key={charIndex}
                 onClick={handleClick}
                 data-char-index={charIndex}
                 data-line-number={lineNumber}
-                data-active={charIndex === coords.x && lineNumber === coords.y}
+                data-active={charIndex === cursor.x && lineNumber === cursor.y}
               >
                 {char}
               </Character>
@@ -54,29 +58,23 @@ const Container = styled.div`
   width: 100vw;
   height: 100vh;
   padding: 1em;
-  font-family: 'SF Mono';
-  line-height: 28px;
+  font-family: 'SF Mono', monospace;
 `
 
 const Line = styled.div`
   display: flex;
   flex-direction: row;
-
-  [data-number] {
-    margin-right: 12px;
-    color: #555;
-  }
 `
 
 const LineNumber = styled.div`
+  margin-right: 12px;
+  color: #555;
   user-select: none;
 `
 
-const LineText = styled.div`
-  max-width: 80ch;
-`
+const LineText = styled.div``
 
-const animation = keyframes`
+const blink = keyframes`
   50% {
     box-shadow: 2px 0px 0px 0px #555;
   }
@@ -86,6 +84,6 @@ const Character = styled('span')<{ 'data-active': boolean }>`
   ${({ 'data-active': active }) =>
     active &&
     css`
-      animation: ${animation} 1s step-start infinite;
+      animation: ${blink} 1s step-start infinite;
     `}
 `
