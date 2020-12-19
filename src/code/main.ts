@@ -1,19 +1,14 @@
-import path from 'path'
-import { app, session, BrowserWindow, Menu, screen } from 'electron'
+import { app, BrowserWindow, screen, session } from 'electron'
+import buildContextMenu from 'electron-context-menu'
 import ElectronStore from 'electron-store'
-import contextMenu from 'electron-context-menu'
-import getTemplate from './menu'
+import path from 'path'
+import buildMenubar from './menu'
 
 let win: BrowserWindow | null
 let store: ElectronStore | null
 
 app.on('ready', () => {
-  contextMenu()
-
-  const displays = screen.getAllDisplays()
-  const externalDisplay = displays.find(display => {
-    return display.bounds.x !== 0 || display.bounds.y !== 0
-  })
+  const externalDisplay = screen.getAllDisplays().find(display => display.bounds.x !== 0 || display.bounds.y !== 0)
 
   win = new BrowserWindow({
     width: 1000,
@@ -25,8 +20,8 @@ app.on('ready', () => {
       spellcheck: false,
       sandbox: true,
       contextIsolation: true,
-      preload: path.resolve(__dirname, 'preload.js'),
-    },
+      preload: path.resolve(__dirname, 'preload.js')
+    }
   })
 
   win.webContents.on('did-frame-finish-load', () => {
@@ -39,7 +34,9 @@ app.on('ready', () => {
   store = new ElectronStore()
   store.clear()
 
-  Menu.setApplicationMenu(Menu.buildFromTemplate(getTemplate()))
+  buildContextMenu()
+  buildMenubar()
+
   win.loadURL('http://localhost:4000/')
   session.defaultSession.loadExtension(path.join(__dirname, 'lib/devtools'))
 })

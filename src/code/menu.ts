@@ -1,51 +1,49 @@
-import { app, MenuItemConstructorOptions } from 'electron'
+import { app, Menu, MenuItemConstructorOptions } from 'electron'
 
-export default function getTemplate(): MenuItemConstructorOptions[] {
+function getTemplate(): MenuItemConstructorOptions[] {
   const template: MenuItemConstructorOptions[] = [
     {
       label: 'File',
       submenu: [
         {
           label: 'New File',
-          accelerator: 'CmdorCtrl+N',
+          accelerator: 'CmdorCtrl+N'
         },
         {
-          type: 'separator',
+          type: 'separator'
         },
         {
           label: 'Open...',
-          accelerator: 'CmdorCtrl+O',
+          accelerator: 'CmdorCtrl+O'
         },
         {
           label: 'Open Recent',
           role: 'recentDocuments',
-          submenu: [
-            { label: 'Clear Recently Opened', role: 'clearRecentDocuments' },
-          ],
+          submenu: [{ label: 'Clear Recently Opened', role: 'clearRecentDocuments' }]
         },
         {
-          type: 'separator',
+          type: 'separator'
         },
         {
           label: 'Save',
-          accelerator: 'CmdorCtrl+S',
+          accelerator: 'CmdorCtrl+S'
         },
         {
           label: 'Save As...',
-          accelerator: 'Shift+CmdorCtrl+S',
+          accelerator: 'Shift+CmdorCtrl+S'
         },
         {
-          type: 'separator',
+          type: 'separator'
         },
         {
           label: 'Close Window',
-          accelerator: 'CmdorCtrl+W',
+          accelerator: 'CmdorCtrl+W'
         },
         {
           label: 'Reopen Closed Window',
-          accelerator: 'Shift+CmdorCtrl+T',
-        },
-      ],
+          accelerator: 'Shift+CmdorCtrl+T'
+        }
+      ]
     },
     {
       label: 'Edit',
@@ -57,8 +55,8 @@ export default function getTemplate(): MenuItemConstructorOptions[] {
         { role: 'copy' },
         { role: 'paste' },
         { role: 'delete' },
-        { role: 'selectAll' },
-      ],
+        { role: 'selectAll' }
+      ]
     },
     {
       label: 'View',
@@ -71,21 +69,21 @@ export default function getTemplate(): MenuItemConstructorOptions[] {
         { role: 'zoomIn' },
         { role: 'zoomOut' },
         { type: 'separator' },
-        { role: 'togglefullscreen' },
-      ],
+        { role: 'togglefullscreen' }
+      ]
     },
     {
       role: 'window',
-      submenu: [{ role: 'minimize' }, { role: 'close' }],
+      submenu: [{ role: 'minimize' }, { role: 'close' }]
     },
     {
       role: 'help',
       submenu: [
         {
-          label: 'Learn more about Textmark',
-        },
-      ],
-    },
+          label: 'Learn more about Textmark'
+        }
+      ]
+    }
   ]
 
   if (process.platform === 'darwin') {
@@ -101,8 +99,8 @@ export default function getTemplate(): MenuItemConstructorOptions[] {
         { role: 'hideOthers' },
         { role: 'unhide' },
         { type: 'separator' },
-        { role: 'quit' },
-      ],
+        { role: 'quit' }
+      ]
     })
 
     if ('push' in template[2].submenu) {
@@ -110,7 +108,7 @@ export default function getTemplate(): MenuItemConstructorOptions[] {
         { type: 'separator' },
         {
           label: 'Speech',
-          submenu: [{ role: 'startSpeaking' }, { role: 'stopSpeaking' }],
+          submenu: [{ role: 'startSpeaking' }, { role: 'stopSpeaking' }]
         }
       )
     }
@@ -120,8 +118,10 @@ export default function getTemplate(): MenuItemConstructorOptions[] {
       { role: 'minimize' },
       { role: 'zoom' },
       { type: 'separator' },
-      { role: 'front' },
+      { role: 'front' }
     ]
   }
   return template
 }
+
+export default (): void => Menu.setApplicationMenu(Menu.buildFromTemplate(getTemplate()))

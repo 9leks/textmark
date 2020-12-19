@@ -7,29 +7,29 @@ const editor = {
   entry: path.resolve(__dirname, 'src/editor/index.tsx'),
   target: 'web',
   resolve: {
-    extensions: ['.tsx', '.scss'],
+    extensions: ['.tsx', '.css']
   },
   output: {
     path: path.resolve(__dirname, 'build/editor'),
-    filename: 'index.js',
+    filename: 'index.js'
   },
   devServer: {
     static: path.resolve(__dirname, 'build/editor'),
-    port: 4000,
+    port: 4000
   },
   module: {
     rules: [
       {
-        test: /\.scss$/,
-        use: ['style-loader', 'css-loader', 'sass-loader'],
-      },
-    ],
+        test: /\.css$/,
+        use: ['style-loader', 'css-loader']
+      }
+    ]
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: path.resolve(__dirname, 'src/editor/index.html'),
-    }),
-  ],
+      template: path.resolve(__dirname, 'src/editor/index.html')
+    })
+  ]
 }
 
 module.exports = merge(base, editor)

@@ -1,19 +1,22 @@
-import React, { FunctionComponent, FormEvent, useState, useRef, useEffect, KeyboardEvent } from 'react'
+import React, { FunctionComponent, useState, useRef, FormEvent, KeyboardEvent } from 'react'
 import { editorSettings } from '../editor-settings'
 
 type Editor = {
   initialLines: string[]
 }
 
+const BLANK = '\u2800'
+const SPACE = '\u00a0'
+
 const Editor: FunctionComponent<Editor> = ({ initialLines }) => {
-  const [lines, setLines] = useState(initialLines.map(line => `${line}\u2800`))
+  const [lines, setLines] = useState(initialLines.map(line => line + BLANK))
   const [cursor, setCursor] = useState({ x: 0, y: 0 })
   const textAreaRef = useRef()
-  const linesRef = useRef()
+  const editorRef = useRef()
 
   const handleMouseClick = (e: FormEvent) => {
     const target = e.target as HTMLSpanElement
-    const y = Number(target.getAttribute('data-y'))
+    const y = Number(target.getAttribute('data-line-nr'))
 
     if (!lines[y]) {
       const x = 0
@@ -21,28 +24,21 @@ const Editor: FunctionComponent<Editor> = ({ initialLines }) => {
       return
     }
 
-    const x = Number(target.getAttribute('data-x'))
+    const x = Number(target.getAttribute('data-char-pos'))
     setCursor({ x, y })
-    focusTextArea()
-  }
 
-  const focusTextArea = () => {
     const textArea = textAreaRef.current as HTMLTextAreaElement
     textArea.focus()
   }
-
-  useEffect(() => {
-    focusTextArea()
-  }, [])
 
   const handleTextInput = () => {
     setLines(prev => {
       const textArea = textAreaRef.current as HTMLTextAreaElement
       const { x, y } = cursor
 
-      const editor = linesRef.current as HTMLDivElement
+      const editor = editorRef.current as HTMLDivElement
       const line = editor.childNodes[y].lastChild.textContent
-      const text = textArea.value === ' ' ? '\u00a0' : textArea.value
+      const text = textArea.value === ' ' ? SPACE : textArea.value
       const nextText = [...prev]
 
       nextText[y] = [line.slice(0, x), text, line.slice(x)].join('')
@@ -54,7 +50,7 @@ const Editor: FunctionComponent<Editor> = ({ initialLines }) => {
   }
 
   const handleCaretMovement = (e: KeyboardEvent) => {
-    const editor = linesRef.current as HTMLDivElement
+    const editor = editorRef.current as HTMLDivElement
     const children = editor.childNodes
     const { x, y } = cursor
 
@@ -65,14 +61,13 @@ const Editor: FunctionComponent<Editor> = ({ initialLines }) => {
         const currLine = children[y].lastChild.textContent
 
         setLines(prev => {
-
           const nextLines = [...prev]
           if (x === currLine.length - 1) {
-            nextLines.splice(y + 1, 0, '\u2800')
+            nextLines.splice(y + 1, 0, BLANK)
           } else if (x === 0) {
-            nextLines.splice(y, 0, '\u2800')
+            nextLines.splice(y, 0, BLANK)
           } else {
-            nextLines[y] = prev[y].slice(0, x) + '\u2800'
+            nextLines[y] = prev[y].slice(0, x) + BLANK
             nextLines.splice(y + 1, 0, prev[y].slice(x))
           }
           return nextLines
@@ -141,7 +136,7 @@ const Editor: FunctionComponent<Editor> = ({ initialLines }) => {
           }
           const nextLine = children[y - 1].lastChild.textContent
           setCursor({ x: nextLine.length - 1, y: y - 1 })
-        } else {
+        } else if (!e.altKey) {
           setCursor({ x: x - 1, y })
         }
 
@@ -154,7 +149,7 @@ const Editor: FunctionComponent<Editor> = ({ initialLines }) => {
             return
           }
           setCursor({ x: 0, y: y + 1 })
-        } else {
+        } else if (!e.altKey) {
           setCursor({ x: x + 1, y })
         }
 
@@ -165,21 +160,21 @@ const Editor: FunctionComponent<Editor> = ({ initialLines }) => {
 
   return (
     <div id="editor-container" style={editorSettings}>
-      <textarea id="input-box" ref={textAreaRef} onInput={handleTextInput} onKeyDown={handleCaretMovement} />
+      <textarea id="input-box" ref={textAreaRef} onInput={handleTextInput} onKeyDown={handleCaretMovement} autoFocus />
       <div id="editor-layout">
         position: {cursor.x + 1} {cursor.y + 1}
-        <div id="editor-lines" ref={linesRef}>
-          {lines.map((line, i) => (
-            <div key={i} data-y={i} className="editor-line">
-              <span className="editor-line-number">{i}</span>
-              <span className="editor-line-content" data-y={i} onClick={handleMouseClick}>
-                {[...line].map((char, j) => (
+        <div id="editor-lines" ref={editorRef}>
+          {lines.map((line, lineNr) => (
+            <div key={lineNr} data-line-nr={lineNr} className="editor-line">
+              <span className="editor-line-number">{lineNr}</span>
+              <span className="editor-line-content" data-line-nr={lineNr} onClick={handleMouseClick}>
+                {[...line].map((char, charPos) => (
                   <span
                     className="editor-line-content-char"
-                    key={j}
-                    data-x={j}
-                    data-y={i}
-                    data-focus={cursor.x === j && cursor.y === i}
+                    key={charPos}
+                    data-char-pos={charPos}
+                    data-line-nr={lineNr}
+                    data-focus={cursor.x === charPos && cursor.y === lineNr}
                     onClick={handleMouseClick}
                   >
                     {char}

@@ -1,6 +1,10 @@
 {
   "plugins": ["stylelint-order", "stylelint-prettier"],
-  "extends": ["stylelint-config-property-sort-order-smacss", "stylelint-config-prettier"],
+  "extends": [
+    "stylelint-config-property-sort-order-smacss",
+    "stylelint-config-prettier",
+    "stylelint-config-styled-components"
+  ],
   "rules": {
     "prettier/prettier": [true, { "singleQuote": false }]
   }

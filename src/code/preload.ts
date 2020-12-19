@@ -3,11 +3,11 @@ import { contextBridge } from 'electron'
 const dummy = {
   file: 'lorem',
   text:
-    "Lorem Ipsum is simply dummy text of the printing and typesetting industry.\nLorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.\n\nIt has survived not only five centuries,\nbut also the leap into electronic typesetting, remaining essentially unchanged.\nIt was popularised in the 1960s with the release of Letraset\n\nsheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of\nLorem Ipsum."
+    'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.\nUt enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.\n\nDuis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.\nExcepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'
 }
 
 contextBridge.exposeInMainWorld('main', {
   onReady: (cb: (lines: string[]) => void) => {
     cb(dummy.text.split('\n'))
-  },
+  }
 })

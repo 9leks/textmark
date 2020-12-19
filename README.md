@@ -1,6 +1,6 @@
 # Textmark
 
-Textmark is a Markdown reader made with Electron, React and Sass.
+Textmark is a Markdown reader made with Electron, React and styled-components.
 
 ## Development
 
