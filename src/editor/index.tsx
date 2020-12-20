@@ -3,7 +3,7 @@ import { render } from 'react-dom'
 import { createGlobalStyle } from 'styled-components'
 import AppRoot from './components/AppRoot'
 
-const Global = createGlobalStyle`
+const GlobalStyle = createGlobalStyle`
   body {
     margin: 0;
     padding: 0;
@@ -13,7 +13,7 @@ const Global = createGlobalStyle`
 window.main.onReady((lines: string[]) => {
   render(
     <Fragment>
-      <Global />
+      <GlobalStyle />
       <AppRoot initialLines={lines} />
     </Fragment>,
     document.getElementById('app')

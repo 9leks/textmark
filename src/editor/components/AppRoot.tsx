@@ -6,20 +6,22 @@ type Root = {
   initialLines: string[]
 }
 
+export interface State {
+  lines: string[]
+  cursor: {
+    x: number
+    y: number
+  }
+}
+
 const AppRoot: FunctionComponent<Root> = ({ initialLines }) => {
-  const [lines, setLines] = useState(initialLines)
-  const [cursor, setCursor] = useState({ x: 0, y: 0 })
+  const [state, setState] = useState({ lines: initialLines, cursor: { x: 0, y: 0 } })
   const [inputHandlerRef, setInputHandlerRef] = useState(null)
 
   return (
     <Fragment>
-      <AppInputHandler
-        lines={lines}
-        setLines={setLines}
-        setCursor={setCursor}
-        setInputHandlerRef={setInputHandlerRef}
-      />
-      <AppEditor lines={lines} cursor={cursor} setCursor={setCursor} inputHandlerRef={inputHandlerRef} />
+      <AppInputHandler setState={setState} setInputHandlerRef={setInputHandlerRef} />
+      <AppEditor state={state} setState={setState} inputHandlerRef={inputHandlerRef} />
     </Fragment>
   )
 }

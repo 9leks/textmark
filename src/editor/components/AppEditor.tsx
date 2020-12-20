@@ -1,14 +1,14 @@
 import React, { FunctionComponent, MutableRefObject, MouseEvent, Dispatch, SetStateAction } from 'react'
 import styled, { css, keyframes } from 'styled-components'
+import { State } from './AppRoot'
 
 type Editor = {
-  lines: string[]
-  cursor: { x: number; y: number }
-  setCursor: Dispatch<SetStateAction<{ x: number; y: number }>>
+  state: State
+  setState: Dispatch<SetStateAction<State>>
   inputHandlerRef: MutableRefObject<HTMLTextAreaElement>
 }
 
-const AppEditor: FunctionComponent<Editor> = ({ lines, cursor, setCursor, inputHandlerRef }) => {
+const AppEditor: FunctionComponent<Editor> = ({ state, setState, inputHandlerRef }) => {
   const handleClick = (evt: MouseEvent) => {
     inputHandlerRef.current.focus()
 
@@ -16,19 +16,21 @@ const AppEditor: FunctionComponent<Editor> = ({ lines, cursor, setCursor, inputH
 
     if (target instanceof HTMLDivElement) {
       const y = Number(target.getAttribute('data-line-number'))
-      const x = lines[y].length
-      setCursor({ x, y })
+      const x = state.lines[y].length
+      const cursor = { x, y }
+      setState({ ...state, cursor })
     } else if (target instanceof HTMLSpanElement) {
       const y = Number(target.getAttribute('data-line-number'))
       const x = Number(target.getAttribute('data-char-index'))
-      setCursor({ x, y })
+      const cursor = { x, y }
+      setState({ ...state, cursor })
     }
   }
 
   return (
     <Container onClick={handleClick}>
-      {cursor.x}:{cursor.y}
-      {lines.map((line, lineNumber) => (
+      {state.cursor.x}:{state.cursor.y}
+      {state.lines.map((line, lineNumber) => (
         <Line key={lineNumber} onClick={handleClick} data-line-number={lineNumber}>
           <LineNumber>{lineNumber}</LineNumber>
           <LineText data-line-number={lineNumber}>
@@ -36,11 +38,12 @@ const AppEditor: FunctionComponent<Editor> = ({ lines, cursor, setCursor, inputH
               <Character
                 key={charIndex}
                 onClick={handleClick}
+                data-is-blank={charIndex === 0}
+                data-is-active={charIndex === state.cursor.x && lineNumber === state.cursor.y}
                 data-char-index={charIndex}
                 data-line-number={lineNumber}
-                data-active={charIndex === cursor.x && lineNumber === cursor.y}
               >
-                {char}
+                {char === ' ' ? '\u00a0' : char}
               </Character>
             ))}
           </LineText>
@@ -55,8 +58,6 @@ export default AppEditor
 const Container = styled.div`
   display: flex;
   flex-direction: column;
-  width: 100vw;
-  height: 100vh;
   padding: 1em;
   font-family: 'SF Mono', monospace;
 `
@@ -64,17 +65,16 @@ const Container = styled.div`
 const Line = styled.div`
   display: flex;
   flex-direction: row;
+  cursor: text;
 `
 
 const LineNumber = styled.div`
-  margin-right: 12px;
+  margin-right: 0.25em;
   color: #555;
   user-select: none;
 `
 
-const LineText = styled.div`
-  margin-left: -1ch;
-`
+const LineText = styled.div``
 
 const blink = keyframes`
   50% {
@@ -82,10 +82,16 @@ const blink = keyframes`
   }
 `
 
-const Character = styled('span')<{ 'data-active': boolean }>`
-  ${({ 'data-active': active }) =>
-    active &&
+const Character = styled('span')<{ 'data-is-active': boolean; 'data-is-blank': boolean }>`
+  ${({ 'data-is-active': isActive }) =>
+    isActive &&
     css`
       animation: ${blink} 1s step-start infinite;
+    `}
+
+  ${({ 'data-is-blank': isBlank }) =>
+    isBlank &&
+    `
+      user-select: none;
     `}
 `

@@ -1,14 +1,13 @@
-import React, { Dispatch, FunctionComponent, KeyboardEvent, SetStateAction, useEffect, useRef } from 'react'
+import React, { Dispatch, FormEvent, FunctionComponent, KeyboardEvent, SetStateAction, useEffect, useRef } from 'react'
 import styled from 'styled-components'
+import { State } from './AppRoot'
 
 type InputHandler = {
-  lines: string[]
-  setLines: Dispatch<SetStateAction<string[]>>
-  setCursor: Dispatch<SetStateAction<{ x: number; y: number }>>
+  setState: Dispatch<SetStateAction<State>>
   setInputHandlerRef: Dispatch<unknown>
 }
 
-const AppInputHandler: FunctionComponent<InputHandler> = ({ setCursor, lines, setLines, setInputHandlerRef }) => {
+const AppInputHandler: FunctionComponent<InputHandler> = ({ setState, setInputHandlerRef }) => {
   const inputHandlerRef = useRef(null)
 
   useEffect(() => {
@@ -18,79 +17,162 @@ const AppInputHandler: FunctionComponent<InputHandler> = ({ setCursor, lines, se
   const handleKeyDown = (evt: KeyboardEvent) => {
     switch (evt.key) {
       case 'Enter': {
-        console.log('Pressed', evt.key)
-        return
+        return void setState(state => {
+          const { cursor, lines } = state
+          const { x, y } = cursor
+
+          if (x === 0) {
+            return { cursor: { x: 0, y: y + 1 }, lines: [...lines.slice(0, y), '', ...lines.slice(y)] }
+          } else if (x === lines[y].length) {
+            return { cursor: { x: 0, y: y + 1 }, lines: [...lines.slice(0, y + 1), '', ...lines.slice(y + 1)] }
+          } else {
+            return {
+              cursor: { x: 0, y: y + 1 },
+              lines: [...lines.slice(0, y), lines[y].slice(0, x), lines[y].slice(x), ...lines.slice(y + 1)]
+            }
+          }
+        })
       }
       case 'Backspace': {
-        console.log('Pressed', evt.key)
-        return
+        return void setState(state => {
+          const { cursor, lines } = state
+          const { x, y } = cursor
+
+          if (x === 0) {
+            if (y === 0) {
+              return state
+            }
+            return {
+              cursor: { x: lines[y - 1].length, y: y - 1 },
+              lines: [...lines.slice(0, y - 1), lines[y - 1] + lines[y], ...lines.slice(y + 1)]
+            }
+          }
+          return {
+            cursor: { x: x - 1, y },
+            lines: [...lines.slice(0, y), lines[y].slice(0, x - 1) + lines[y].slice(x), ...lines.slice(y + 1)]
+          }
+        })
+      }
+      case 'Home': {
+        return void setState(state => {
+          const { cursor } = state
+          const { y } = cursor
+          return { ...state, cursor: { x: 0, y } }
+        })
+      }
+      case 'End': {
+        return void setState(state => {
+          const { cursor, lines } = state
+          const { y } = cursor
+          return { ...state, cursor: { x: lines[y].length, y } }
+        })
+      }
+      case 'PageUp': {
+        return void setState(state => ({ ...state, cursor: { x: 0, y: 0 } }))
+      }
+      case 'PageDown': {
+        return void setState(state => {
+          const { lines } = state
+          return { ...state, cursor: { x: lines[lines.length - 1].length, y: lines.length - 1 } }
+        })
       }
       case 'ArrowLeft': {
-        return void setCursor(cursor => {
-          if (cursor.x === 0) {
-            if (cursor.y === 0) {
-              return cursor
-            } else {
-              const y = cursor.y - 1
-              const x = lines[cursor.y - 1].length
-              return { x, y }
+        return void setState(state => {
+          const { cursor, lines } = state
+          const { x, y } = cursor
+
+          if (x === 0) {
+            if (y === 0) {
+              return state
             }
+            return { ...state, cursor: { x: lines[y - 1].length, y: y - 1 } }
+          } else if (evt.altKey || evt.ctrlKey) {
+            return { ...state, cursor: { x: lines[y].lastIndexOf(' ', x - 2) + 1, y } }
           } else {
-            const y = cursor.y
-            const x = cursor.x - 1
-            return { x, y }
+            return { ...state, cursor: { x: x - 1, y } }
           }
         })
       }
       case 'ArrowRight': {
-        return void setCursor(cursor => {
-          if (cursor.x === lines[cursor.y].length) {
-            if (cursor.y === lines.length - 1) {
-              return cursor
-            } else {
-              const y = cursor.y + 1
-              const x = 0
-              return { x, y }
+        return void setState(state => {
+          const { cursor, lines } = state
+          const { x, y } = cursor
+
+          if (x === lines[y].length) {
+            if (y === lines.length - 1) {
+              return state
             }
+            return { ...state, cursor: { x: 0, y: y + 1 } }
+          } else if (evt.altKey || evt.ctrlKey) {
+            return { ...state, cursor: { x: lines[y].indexOf(' ', x) + 1, y } }
           } else {
-            const y = cursor.y
-            const x = cursor.x + 1
-            return { x, y }
+            return { ...state, cursor: { x: x + 1, y } }
           }
         })
       }
       case 'ArrowUp': {
-        return void setCursor(cursor => {
-          if (cursor.y === 0) {
-            return cursor
-          } else {
-            const y = cursor.y - 1
-            const x = lines[cursor.y - 1].length < cursor.x ? lines[cursor.y - 1].length : cursor.x
-            return { x, y }
+        return void setState(state => {
+          const { cursor, lines } = state
+          const { x, y } = cursor
+
+          if (y === 0) {
+            return state
           }
+
+          if (evt.altKey || evt.ctrlKey) {
+            return {
+              cursor: { x, y: y - 1 },
+              lines: [...lines.slice(0, y - 1), lines[y], lines[y - 1], ...lines.slice(y + 1)]
+            }
+          }
+
+          return { ...state, cursor: { x: lines[y - 1].length >= x ? x : lines[y - 1].length, y: y - 1 } }
         })
       }
       case 'ArrowDown': {
-        return void setCursor(cursor => {
-          if (cursor.y === lines.length - 1) {
-            return cursor
-          } else {
-            const y = cursor.y + 1
-            const x = lines[cursor.y + 1].length < cursor.x ? lines[cursor.y + 1].length : cursor.x
-            return { x, y }
+        return void setState(state => {
+          const { cursor, lines } = state
+          const { x, y } = cursor
+
+          if (y === lines.length - 1) {
+            return state
           }
+
+          if (evt.altKey || evt.ctrlKey) {
+            return {
+              cursor: { x, y: y + 1 },
+              lines: [...lines.slice(0, y), lines[y + 1], lines[y], ...lines.slice(y + 2)]
+            }
+          }
+
+          return { ...state, cursor: { x: lines[y + 1].length >= x ? x : lines[y + 1].length, y: y + 1 } }
         })
       }
-      default: {
-        console.log('Pressed', evt.key)
-      }
     }
-
-    const target = evt.target as HTMLTextAreaElement
-    target.value = ''
   }
 
-  return <TextArea onKeyDown={handleKeyDown} autoFocus ref={inputHandlerRef} />
+  const handleInput = (evt: FormEvent) => {
+    const input = evt.target as HTMLTextAreaElement
+    const char = input.value
+
+    if (char.includes('\n')) {
+      return
+    }
+
+    return void setState(state => {
+      const { cursor, lines } = state
+      const { x, y } = cursor
+
+      input.value = ''
+
+      return {
+        cursor: { x: x + 1, y },
+        lines: [...lines.slice(0, y), lines[y].slice(0, x) + char + lines[y].slice(x), ...lines.slice(y + 1)]
+      }
+    })
+  }
+
+  return <TextArea onKeyDown={handleKeyDown} onInput={handleInput} autoFocus ref={inputHandlerRef} />
 }
 
 export default AppInputHandler
