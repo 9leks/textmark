@@ -1,6 +1,6 @@
 import React, { Fragment, FunctionComponent, useState } from 'react'
 import AppEditor from './AppEditor'
-import InputReader from './InputReader'
+import AppInputHandler from './AppInputHandler'
 
 type Root = {
   initialLines: string[]
@@ -9,12 +9,17 @@ type Root = {
 const AppRoot: FunctionComponent<Root> = ({ initialLines }) => {
   const [lines, setLines] = useState(initialLines)
   const [cursor, setCursor] = useState({ x: 0, y: 0 })
-  const [readerRef, setReaderRef] = useState(null)
+  const [inputHandlerRef, setInputHandlerRef] = useState(null)
 
   return (
     <Fragment>
-      <InputReader setLines={setLines} cursor={cursor} setCursor={setCursor} setReaderRef={setReaderRef} />
-      <AppEditor lines={lines} cursor={cursor} setCursor={setCursor} readerRef={readerRef} />
+      <AppInputHandler
+        lines={lines}
+        setLines={setLines}
+        setCursor={setCursor}
+        setInputHandlerRef={setInputHandlerRef}
+      />
+      <AppEditor lines={lines} cursor={cursor} setCursor={setCursor} inputHandlerRef={inputHandlerRef} />
     </Fragment>
   )
 }

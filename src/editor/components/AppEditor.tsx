@@ -5,18 +5,18 @@ type Editor = {
   lines: string[]
   cursor: { x: number; y: number }
   setCursor: Dispatch<SetStateAction<{ x: number; y: number }>>
-  readerRef: MutableRefObject<HTMLTextAreaElement>
+  inputHandlerRef: MutableRefObject<HTMLTextAreaElement>
 }
 
-const AppEditor: FunctionComponent<Editor> = ({ lines, cursor, setCursor, readerRef }) => {
+const AppEditor: FunctionComponent<Editor> = ({ lines, cursor, setCursor, inputHandlerRef }) => {
   const handleClick = (evt: MouseEvent) => {
-    readerRef.current.focus()
+    inputHandlerRef.current.focus()
 
     const target = evt.target as HTMLDivElement | HTMLSpanElement
 
     if (target instanceof HTMLDivElement) {
       const y = Number(target.getAttribute('data-line-number'))
-      const x = lines[y].length - 1
+      const x = lines[y].length
       setCursor({ x, y })
     } else if (target instanceof HTMLSpanElement) {
       const y = Number(target.getAttribute('data-line-number'))
@@ -32,7 +32,7 @@ const AppEditor: FunctionComponent<Editor> = ({ lines, cursor, setCursor, reader
         <Line key={lineNumber} onClick={handleClick} data-line-number={lineNumber}>
           <LineNumber>{lineNumber}</LineNumber>
           <LineText data-line-number={lineNumber}>
-            {[...line].map((char, charIndex) => (
+            {['\u00a0', ...line].map((char, charIndex) => (
               <Character
                 key={charIndex}
                 onClick={handleClick}
@@ -72,7 +72,9 @@ const LineNumber = styled.div`
   user-select: none;
 `
 
-const LineText = styled.div``
+const LineText = styled.div`
+  margin-left: -1ch;
+`
 
 const blink = keyframes`
   50% {
