@@ -1,0 +1,19 @@
+{
+  "root": true,
+  "env": {
+    "browser": true,
+    "es2021": true,
+    "node": true
+  },
+  "extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended"],
+  "parserOptions": {
+    "parser": "@typescript-eslint/parser",
+    "ecmaVersion": 12,
+    "sourceType": "module"
+  },
+  "plugins": ["@typescript-eslint"],
+  "rules": {
+    "@typescript-eslint/no-var-requires": "off"
+  },
+  "ignorePatterns": ["lib", "build"]
+}

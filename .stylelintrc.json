@@ -1,0 +1,4 @@
+{
+  "extends": ["stylelint-config-standard", "stylelint-config-idiomatic-order"],
+  "rules": { "indentation": 2, "no-eol-whitespace": null, "no-missing-end-of-source-newline": null }
+}
