@@ -1,13 +1,13 @@
 const base = {
   mode: "development",
-  devtool: "inline-source-map",
+  devtool: "source-map",
   resolve: {
     extensions: [".ts", ".js"],
   },
   module: {
     rules: [
       {
-        test: /\.ts?$/,
+        test: /\.ts$/,
         include: /src/,
         exclude: /node_modules/,
         use: [
