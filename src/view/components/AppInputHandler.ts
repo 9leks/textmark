@@ -25,14 +25,6 @@ export default class AppInputHandler extends MobxReactionUpdate(LitElement) {
   }
 
   handleKeyDown = (evt: KeyboardEvent): void => {
-    if (["Control", "Alt", "Meta", "CapsLock", "Shift"].includes(evt.key)) {
-      return
-    }
-
-    if (!(window.api.os() === "darwin" ? evt.metaKey : evt.ctrlKey)) {
-      this.focus()
-    }
-
     const { x, y } = store.cursor
     const { lines } = store.text
 
@@ -105,7 +97,7 @@ export default class AppInputHandler extends MobxReactionUpdate(LitElement) {
           if (y === 0) {
             break
           }
-          store.cursor.set(lines[y - 1].length - 1, y - 1)
+          store.cursor.set(lines[y - 1].length, y - 1)
           break
         } else if (evt.altKey || evt.ctrlKey) {
           store.cursor.set(lines[y].lastIndexOf(" ", x - 2) + 1, y)
@@ -115,14 +107,19 @@ export default class AppInputHandler extends MobxReactionUpdate(LitElement) {
         break
       }
       case "ArrowRight": {
-        if (x === lines[y].length - 1) {
+        if (x === lines[y].length) {
           if (y === lines.length - 1) {
             break
           }
           store.cursor.set(0, y + 1)
           break
         } else if (evt.altKey || evt.ctrlKey) {
-          store.cursor.set(lines[y].indexOf(" ", x) + 1, y)
+          const index = lines[y].indexOf(" ", x) + 1
+          if (index > 0) {
+            store.cursor.set(index, y)
+          } else {
+            store.cursor.set(lines[y].length, y)
+          }
           break
         }
         store.cursor.set(x + 1, y)

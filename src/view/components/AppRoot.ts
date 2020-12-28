@@ -6,6 +6,7 @@ export default class AppRoot extends LitElement {
   render(): TemplateResult {
     return html`
       <app-input-handler /></app-input-handler>
+      <app-cursor></app-cursor>
       <app-interface /></app-interface>
     `
   }

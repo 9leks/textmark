@@ -3,8 +3,6 @@ import { css, html, LitElement, TemplateResult } from "lit-element"
 export default class AppInterface extends LitElement {
   static tag = "app-interface"
 
-  // TODO: scroll down page with content
-
   render(): TemplateResult {
     return html`
       <app-numberline></app-numberline>

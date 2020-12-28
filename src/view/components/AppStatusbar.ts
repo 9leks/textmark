@@ -12,15 +12,16 @@ export default class AppStatusbar extends MobxReactionUpdate(LitElement) {
   static styles = css`
     :host {
       position: fixed;
+      z-index: 10;
       bottom: 0;
       left: 0;
       width: 100%;
       background-color: #ddd;
-      user-select: none;
+      pointer-events: none;
     }
 
     .cursor {
-      padding: 0.25em;
+      margin-left: 0.5em;
     }
   `
 }

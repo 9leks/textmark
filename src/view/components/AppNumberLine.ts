@@ -6,7 +6,7 @@ export default class AppNumberLine extends MobxReactionUpdate(LitElement) {
   static tag = "app-numberline"
 
   render(): TemplateResult {
-    return html`${store.text.lines.map((_, i: number) => html`<div>${i + 1}</div>`)}`
+    return html`${store.text.lines.map((_, i: number) => html`<div>${i}</div>`)}`
   }
 
   static styles = css`
@@ -17,7 +17,7 @@ export default class AppNumberLine extends MobxReactionUpdate(LitElement) {
       color: #888;
       direction: rtl;
       font-size: 0.9em;
-      user-select: none;
+      pointer-events: none;
     }
   `
 }
