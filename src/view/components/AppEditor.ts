@@ -111,33 +111,23 @@ export default class AppEditor extends MobxReactionUpdate(LitElement) {
 
   render(): TemplateResult {
     return html`
-      <div class="lines" tabindex="-1" @keydown=${this.handleKeyDown}>
+      <div
+        class="lines"
+        tabindex="-1"
+        @keydown=${this.handleKeyDown}
+        @mousedown=${this.handleMouseDown}
+        @mouseover=${this.handleMouseOver}
+        data-state-x=${store.cursor.x /* for mobx tracking */}
+        data-state-y=${store.cursor.y /* for mobx tracking */}
+      >
         ${store.text.lines.map(
           (line: string, lineIndex: number) =>
-            html` <span
-              class="line"
-              data-line="${lineIndex}"
-              @mousedown=${this.handleMouseDown}
-              @mouseover=${this.handleMouseOver}
-            >
+            html` <span class="line" data-line="${lineIndex}" }>
               ${!line
-                ? html`<br
-                    class="character"
-                    data-character="0"
-                    data-active=${0 === store.cursor.x && lineIndex === store.cursor.y}
-                    @mousedown=${this.handleMouseDown}
-                    @mouseover=${this.handleMouseOver}
-                  />`
+                ? html`<br class="character" data-character="0" />`
                 : [...line].map(
                     (character: string, characterIndex: number) =>
-                      html`<span
-                        class="character"
-                        data-character=${characterIndex}
-                        data-active=${characterIndex === store.cursor.x && lineIndex === store.cursor.y}
-                        @mousedown=${this.handleMouseDown}
-                        @mouseover=${this.handleMouseOver}
-                        >${character}</span
-                      >`
+                      html`<span class="character" data-character=${characterIndex}>${character}</span>`
                   )}
             </span>`
         )}
