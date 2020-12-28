@@ -1,4 +1,4 @@
-import { html, LitElement, TemplateResult } from "lit-element"
+import { css, html, LitElement, TemplateResult } from "lit-element"
 
 export default class AppRoot extends LitElement {
   static tag = "app-root"
@@ -6,7 +6,6 @@ export default class AppRoot extends LitElement {
   render(): TemplateResult {
     return html`
       <app-input-handler /></app-input-handler>
-      <app-cursor></app-cursor>
       <app-interface /></app-interface>
     `
   }

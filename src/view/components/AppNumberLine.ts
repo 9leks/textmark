@@ -11,13 +11,14 @@ export default class AppNumberLine extends MobxReactionUpdate(LitElement) {
 
   static styles = css`
     :host {
-      display: grid;
       min-width: 0;
-      padding-left: 3ch;
+      padding-left: 4.5ch;
       color: #888;
       direction: rtl;
       font-size: 0.9em;
+      line-height: 1.7em;
       pointer-events: none;
+      user-select: none;
     }
   `
 }

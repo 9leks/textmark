@@ -96,7 +96,7 @@ export default class AppEditor extends MobxReactionUpdate(LitElement) {
     .lines {
       display: grid;
       cursor: text;
-      grid-auto-rows: 1fr;
+      line-height: 1.5em;
       outline: none;
       white-space: nowrap;
     }
@@ -121,6 +121,7 @@ export default class AppEditor extends MobxReactionUpdate(LitElement) {
       animation: blink 1s step-end infinite;
       color: #111;
       font-weight: bold;
+      user-select: none;
     }
 
     .cursor.boundary {
