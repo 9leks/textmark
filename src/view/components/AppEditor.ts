@@ -72,7 +72,7 @@ export default class AppEditor extends MobxReactionUpdate(LitElement) {
         ${store.text.lines.map(
           (line: string, lineIndex: number) =>
             html`
-              <span data-line="${lineIndex}" @mousedown=${this.handleMouseDown}>
+              <span class="line" data-line="${lineIndex}" @mousedown=${this.handleMouseDown}>
                 ${!line
                   ? html`<br />`
                   : [...line].map(
@@ -101,9 +101,12 @@ export default class AppEditor extends MobxReactionUpdate(LitElement) {
       white-space: nowrap;
     }
 
-    .character {
+    .line {
       position: relative;
       z-index: 1;
+    }
+
+    .character {
       white-space: pre;
     }
 
