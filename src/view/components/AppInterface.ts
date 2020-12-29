@@ -5,7 +5,7 @@ export default class AppInterface extends LitElement {
 
   render(): TemplateResult {
     return html`
-      <span>
+      <span class="lines">
         <app-numberline></app-numberline>
         <app-editor></app-editor>
       </span>
@@ -14,6 +14,20 @@ export default class AppInterface extends LitElement {
   }
 
   static styles = css`
+    :host {
+      display: flex;
+      height: 100%;
+      flex-direction: column;
+      font-family: "SF Mono", "Courier", monospace;
+    }
+
+    .lines {
+      display: flex;
+      overflow: auto;
+      flex: 1;
+      line-height: var(--editor-line-height);
+    }
+
     ::-webkit-scrollbar {
       width: 0.7em;
       height: 0.7em;
@@ -22,44 +36,15 @@ export default class AppInterface extends LitElement {
 
     ::-webkit-scrollbar-thumb {
       background: #ddd;
+      box-shadow: inset 0 0 1px #0005;
     }
 
     ::-webkit-scrollbar-corner {
       background-color: transparent;
     }
 
-    :host {
-      display: grid;
-      height: 100%;
-      font-family: "SF Mono", "Courier", monospace;
-      grid-template-areas:
-        "h h"
-        "f f";
-      grid-template-rows: 1fr auto;
-    }
-
     ::-webkit-scrollbar-thumb:hover {
       background-color: #77777773;
-    }
-
-    span {
-      display: flex;
-      overflow: auto;
-      padding-top: 1em;
-      gap: 1em;
-      grid-area: h;
-    }
-
-    app-numberline {
-      grid-area: n;
-    }
-
-    app-editor {
-      grid-area: e;
-    }
-
-    app-statusbar {
-      grid-area: f;
     }
   `
 }

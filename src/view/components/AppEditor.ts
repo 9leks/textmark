@@ -7,35 +7,10 @@ import AppInputHandler from "./AppInputHandler"
 export default class AppEditor extends MobxReactionUpdate(LitElement) {
   static tag = "app-editor"
 
-  updated() {
-    const previous = <HTMLSpanElement>querySelectorDeep("app-editor span.cursor")
-    if (previous) {
-      previous.remove()
-    }
+  // TODO: make cursor visually follow selection focus node
+  // TODO: double click selection
+  // TODO: soft wrapping
 
-    const { lines } = store.text
-    const { x, y } = store.cursor
-    const caret = document.createElement("span")
-    caret.innerText = "|"
-
-    if (lines[y].length === 0 || x === lines[y].length) {
-      caret.className = "cursor boundary"
-      const selector = `span[data-line="${y}"]`
-      const line = <HTMLDivElement>querySelectorDeep(selector)
-      if (lines[y].length === 0) {
-        line.insertBefore(caret, line.firstChild)
-      } else {
-        line.appendChild(caret)
-      }
-    } else {
-      caret.className = "cursor"
-      const selector = `span[data-line="${y}"] span[data-character="${x}"]`
-      const character = <HTMLSpanElement>querySelectorDeep(selector)
-      character.parentNode.insertBefore(caret, character.nextSibling)
-    }
-  }
-
-  // TODO show cursor as it changes during selection
   setCursorAtFocusNode(evt: MouseEvent | KeyboardEvent): void {
     const selection = this.shadowRoot.getSelection()
     if (selection.toString().length > 0) {
@@ -44,14 +19,14 @@ export default class AppEditor extends MobxReactionUpdate(LitElement) {
       const backwards = selection.anchorNode !== selection.getRangeAt(0).startContainer
 
       if (focus.className === "lines" && target.className === "line") {
-        const y = Number(target.getAttribute("data-line"))
+        const y = Number(target.dataset.y)
         store.cursor.set(0, y)
       } else if (focus.className === "line" && backwards) {
-        const y = Number(focus.getAttribute("data-line"))
+        const y = Number(focus.dataset.y)
         store.cursor.set(store.text.lines[y].length, y)
-      } else if (focus.className === "character") {
-        const x = Number(focus.getAttribute("data-character"))
-        const y = Number(focus.parentElement.getAttribute("data-line"))
+      } else if (focus.className === "char") {
+        const x = Number(focus.dataset.x)
+        const y = Number(focus.parentElement.dataset.y)
         store.cursor.set(backwards ? x : x + 1, y)
       } else {
         // select downwards from outside window
@@ -59,7 +34,7 @@ export default class AppEditor extends MobxReactionUpdate(LitElement) {
         const start = <HTMLDivElement>range.startContainer
         const end = <HTMLDivElement>range.endContainer
         const node = start.className === "line" ? start : end
-        const y = Number(node.getAttribute("data-line"))
+        const y = Number(node.dataset.y)
         store.cursor.set(0, y)
       }
     }
@@ -67,24 +42,61 @@ export default class AppEditor extends MobxReactionUpdate(LitElement) {
 
   connectedCallback() {
     super.connectedCallback()
-    // document to catch event outside window. arrow function due to memoization.
-    document.addEventListener("mouseup", (evt: MouseEvent) => this.setCursorAtFocusNode(evt))
+    // document instead of shadowroot to catch event outside window.
+    document.addEventListener("mouseup", (evt: MouseEvent) => {
+      this.setCursorAtFocusNode(evt)
+    })
+  }
+
+  updated() {
+    const previous = <HTMLSpanElement>querySelectorDeep("app-editor .caret")
+    if (previous) {
+      previous.remove()
+    }
+
+    const { lines } = store.text
+    const { x, y } = store.cursor
+    const boundary = lines[y].length === 0 || x === lines[y].length
+    const selector = `.line[data-y="${y}"] ${boundary ? "" : `.char[data-x="${x}"]`}`
+    const focus = <HTMLSpanElement | HTMLDivElement>querySelectorDeep(selector)
+    const caret = document.createElement("span")
+    caret.innerText = "\u00a0"
+    caret.className = `caret${boundary ? " boundary" : ""}`
+
+    if (lines[y].length === 0) {
+      focus.insertBefore(caret, focus.firstChild)
+    } else if (x === lines[y].length) {
+      focus.appendChild(caret)
+    } else {
+      focus.parentNode.insertBefore(caret, focus.nextSibling)
+    }
   }
 
   handleMouseDown(evt: MouseEvent): void {
     evt.stopPropagation()
     const target = evt.target as HTMLDivElement | HTMLSpanElement
 
-    if (target.hasAttribute("data-line")) {
-      const y = Number(target.getAttribute("data-line"))
+    if (target.className === "line") {
+      const y = Number(target.dataset.y)
       const x = store.text.lines[y].length > 0 ? store.text.lines[y].length : 0
       store.cursor.set(x, y)
     }
 
-    if (target.hasAttribute("data-character")) {
-      const x = Number(target.getAttribute("data-character"))
-      const y = Number(target.parentElement.getAttribute("data-line"))
+    if (target.className === "char") {
+      const y = Number(target.parentElement.dataset.y)
+      const x = Number(target.dataset.x)
       store.cursor.set(x, y)
+    }
+  }
+
+  handleMouseOver(evt: MouseEvent) {
+    if (evt.buttons === 1) {
+      if (this.shadowRoot.getSelection().toString().length > 0) {
+        const caret = <HTMLSpanElement>querySelectorDeep("app-editor .caret")
+        if (caret) {
+          caret.remove()
+        }
+      }
     }
   }
 
@@ -100,15 +112,6 @@ export default class AppEditor extends MobxReactionUpdate(LitElement) {
     }
   }
 
-  handleMouseOver(evt: MouseEvent) {
-    if (evt.buttons === 1) {
-      const caret = <HTMLSpanElement>querySelectorDeep("app-editor span.cursor")
-      if (caret) {
-        caret.remove()
-      }
-    }
-  }
-
   render(): TemplateResult {
     return html`
       <div
@@ -118,61 +121,69 @@ export default class AppEditor extends MobxReactionUpdate(LitElement) {
         @mousedown=${this.handleMouseDown}
         @mouseover=${this.handleMouseOver}
         data-state-x=${store.cursor.x /* for mobx tracking */}
-        data-state-y=${store.cursor.y /* for mobx tracking */}
       >
-        ${store.text.lines.map(
-          (line: string, lineIndex: number) =>
-            html` <span class="line" data-line="${lineIndex}" }>
+        ${store.text.lines.map((line: string, y: number) => {
+          return html`
+            <span class="line" active=${y === store.cursor.y} data-y="${y}">
               ${!line
-                ? html`<br class="character" data-character="0" />`
-                : [...line].map(
-                    (character: string, characterIndex: number) =>
-                      html`<span class="character" data-character=${characterIndex}>${character}</span>`
-                  )}
-            </span>`
-        )}
+                ? html`<br class="char" data-x="0" />`
+                : [...line].map((c: string, x: number) => {
+                    return html`<span class="char" data-x=${x}>${c}</span>`
+                  })}
+            </span>
+          `
+        })}
       </div>
     `
   }
 
   static styles = css`
     .lines {
-      display: grid;
+      display: flex;
+      flex-direction: column;
       padding-right: 1em;
       cursor: text;
-      line-height: 1.5em;
       outline: none;
       white-space: nowrap;
     }
 
     .line {
       position: relative;
-      z-index: 0;
+      z-index: 1;
+      color: #000d;
     }
 
-    .character {
+    .line[active="true"] {
+      background-color: var(--active-bg-color);
+      box-shadow:
+        inset 0 1px 1px -1px var(--active-box-shadow-color),
+        inset 0 -1px 1px -1px var(--active-box-shadow-color);
+      color: var-(--active-font-color);
+      font-weight: var(--active-font-weight);
+    }
+
+    .char {
       white-space: pre;
+    }
+
+    .caret {
+      position: absolute;
+      z-index: 0;
+      width: 0.3ch;
+      margin-left: -1ch;
+      animation: blink 1s step-end infinite;
+      background: #0009;
+      user-select: none;
+    }
+
+    .caret.boundary {
+      margin-left: 0;
     }
 
     @keyframes blink {
       50% {
         opacity: 0;
       }
-    }
-
-    .cursor {
-      position: absolute;
-      z-index: -1;
-      margin-top: -0.05em;
-      margin-left: -1.5ch;
-      animation: blink 1s step-end infinite;
-      color: #111;
-      font-weight: bold;
-      user-select: none;
-    }
-
-    .cursor.boundary {
-      margin-left: -0.5ch;
     }
   `
 }

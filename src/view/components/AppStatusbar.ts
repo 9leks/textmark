@@ -12,14 +12,15 @@ export default class AppStatusbar extends MobxReactionUpdate(LitElement) {
   static styles = css`
     :host {
       display: flex;
-      height: 1.75em;
+      height: 2em;
       align-items: center;
-      background-color: #aaa;
+      box-shadow: inset 0 0 3px #0005;
       font-family: "SF Mono", "Courier", monospace;
     }
 
     .position {
       margin-left: 0.5em;
+      color: #000c;
     }
   `
 }
