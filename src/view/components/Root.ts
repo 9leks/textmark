@@ -14,11 +14,13 @@ export default class Root extends LitElement {
 
   static styles = css`
     :host {
+      --font-size: 16px;
+
       display: flex;
       height: 100%;
       flex-direction: column;
       font-family: "SF Mono", "Courier New", monospace;
-      font-size: 16px;
+      font-size: var(--font-size);
     }
 
     #main {

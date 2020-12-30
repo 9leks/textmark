@@ -7,13 +7,9 @@ export default class NumberLine extends MobxReactionUpdate(LitElement) {
     return html`
       ${store.lines.map((_, y: number) => {
         const focused = y === store.y
-        return html`<div class="line" ?focused=${focused} .y=${y}>${y}</div>`
+        return html`<div class="line" ?appFocused=${focused}>${y}</div>`
       })}
     `
-  }
-
-  constructor() {
-    super()
   }
 
   static styles = css`
@@ -22,6 +18,7 @@ export default class NumberLine extends MobxReactionUpdate(LitElement) {
       flex-direction: column;
       box-shadow: 1px 0 3px -1px #0002;
       pointer-events: none;
+      user-select: none;
     }
 
     .line {
@@ -31,9 +28,9 @@ export default class NumberLine extends MobxReactionUpdate(LitElement) {
       font-size: 0.9em;
     }
 
-    .line[focused] {
+    .line[appFocused] {
       color: #000000ea;
-      font-weight: var(--focused-font-weight);
+      font-weight: var(--appFocused-font-weight);
     }
   `
 }

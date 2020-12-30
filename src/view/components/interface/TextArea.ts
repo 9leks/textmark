@@ -3,12 +3,14 @@ import { css, html, LitElement, TemplateResult } from "lit-element"
 import store from "../../store"
 import InputHandler from "../inputhandler/InputHandler"
 
+const MAX_CHUNK_SIZE = 30
+
 function isLine(line: TextAreaElement): line is LineElement {
-  return (line as LineElement).appOffsetY !== undefined
+  return (<LineElement>line).appOffsetY !== undefined
 }
 
-function isChar(char: TextAreaElement): char is CharElement {
-  return (char as CharElement).appOffsetX !== undefined
+function isChunk(chunk: TextAreaElement): chunk is ChunkElement {
+  return (<ChunkElement>chunk).appChunkN !== undefined
 }
 
 export default class TextArea extends MobxReactionUpdate(LitElement) {
@@ -25,36 +27,82 @@ export default class TextArea extends MobxReactionUpdate(LitElement) {
   }
 
   updated() {
-    const { x, y } = store
-    this.setCaret(x, y)
+    this.setCaret(store.x, store.y)
   }
 
   render(): TemplateResult {
     return html`
       ${store.lines.map((line, y) => {
-        const focused = y === store.y
-        const newline = html`<br />`
-        return html`<span class="line" ?focused=${focused} .appOffsetY=${y}
-          >${!line
-            ? newline
-            : [...line].map((character, x) => {
-                const focused = x === store.x && y === store.y
-                return html`<span class="character" ?focused=${focused} .appOffsetX=${x}>${character}</span>`
-              })}</span
-        >`
+        store.x // for mobx store tracking
+        const chunks = line.match(new RegExp(`.{1,${MAX_CHUNK_SIZE}}`, "g"))
+
+        return html`
+          <div class="line" .appOffsetY=${y} ?appFocused=${y === store.y}>
+            ${!chunks
+              ? html`<br />`
+              : chunks.map((chunk, chunkOffset) => {
+                  return html`<span class="chunk" .appChunkN=${chunkOffset}>${chunk}</span>`
+                })}
+          </div>
+        `
       })}
     `
   }
 
+  getCharacterWidth() {
+    const fontSize = Number(getComputedStyle(this).getPropertyValue("--font-size").slice(0, -2))
+    const letterSpacing = 1
+    return letterSpacing + 0.5 * fontSize + letterSpacing
+  }
+
+  setCaret(x: number, y: number): void {
+    const precaret = this.shadowRoot.querySelector(".caret")
+    if (precaret) {
+      const line = <LineElement>precaret.parentElement.parentElement
+      precaret.remove()
+
+      if (line.childElementCount === 1 && !line.firstElementChild.hasChildNodes()) {
+        const br = document.createElement("br")
+        line.append(br)
+      }
+    }
+
+    const caret = document.createElement("span")
+    const left = this.getCharacterWidth() * (x % MAX_CHUNK_SIZE)
+    caret.className = "caret"
+    caret.innerText = "\u00a0"
+    caret.style.left = `${left - 3}px`
+
+    const line = this.shadowRoot.children[y]
+    const chunkN = Math.floor(x / MAX_CHUNK_SIZE)
+
+    if (line.children[chunkN] instanceof HTMLBRElement) {
+      line.children[chunkN].remove()
+    }
+
+    if (!line.children[chunkN]) {
+      const chunk = <ChunkElement>document.createElement("span")
+      chunk.className = "chunk"
+      chunk.appChunkN = chunkN
+      line.append(chunk)
+    }
+
+    const chunk = line.children[chunkN]
+    chunk.append(caret)
+  }
+
   handleMouseDown(evt: MouseEvent) {
     const el = <TextAreaElement>evt.composedPath()[0]
+    const charWidth = this.getCharacterWidth()
+    const leftOffset = Math.max(0, evt.pageX - el.getBoundingClientRect().left)
 
     if (isLine(el)) {
-      const x = store.lines[el.appOffsetY].length
+      const x = leftOffset < charWidth ? 0 : store.lines[el.appOffsetY].length
       const y = el.appOffsetY
       store.setCoords(x, y)
-    } else if (isChar(el)) {
-      const x = el.appOffsetX
+    } else if (isChunk(el)) {
+      const charOffset = (charWidth / 2 < leftOffset ? Math.ceil : Math.floor)(leftOffset / charWidth)
+      const x = el.appChunkN * MAX_CHUNK_SIZE + charOffset
       const y = el.parentElement.appOffsetY
       store.setCoords(x, y)
     }
@@ -75,32 +123,6 @@ export default class TextArea extends MobxReactionUpdate(LitElement) {
     const selection = this.shadowRoot.getSelection()
 
     if (selection.toString().length > 0) {
-      const range = selection.getRangeAt(0)
-      const end = <CharElement>range.startContainer.parentElement
-      const start = <CharElement>range.endContainer.parentElement
-
-      const backwards = selection.anchorNode !== selection.getRangeAt(0).startContainer
-      const focusedEl = backwards ? end : start
-
-      if (focusedEl) {
-        const x = focusedEl.appOffsetX + (backwards && selection.focusOffset !== 1 ? 0 : 1)
-        const y = focusedEl.parentElement.appOffsetY
-        store.setCoords(x, y)
-      } else {
-        const target = <TextAreaElement>evt.composedPath()[0]
-
-        if (isLine(target)) {
-          const x = 0
-          const y = target.appOffsetY
-          store.setCoords(x, y)
-        } else {
-          const lineHeight = Number(getComputedStyle(this).getPropertyValue("--line-height").slice(0, -2))
-          var offset = this.parentElement.scrollTop
-          const x = 0
-          const y = Math.floor((offset + evt.pageY) / lineHeight)
-          store.setCoords(x, y)
-        }
-      }
     }
   }
 
@@ -114,96 +136,45 @@ export default class TextArea extends MobxReactionUpdate(LitElement) {
     }
   }
 
-  setCaret(x: number, y: number): void {
-    const precursor = this.shadowRoot.querySelector(".caret")
-    if (precursor) {
-      precursor.remove()
-    }
-
-    const line = this.shadowRoot.children[y]
-    const character = line.children[x]
-
-    const caret = <HTMLSpanElement>document.createElement("span")
-    caret.innerHTML = "\u00a0"
-    caret.className = "caret"
-
-    if (x === 0) {
-      caret.classList.add("start")
-      if (store.lines[y].length < 1) {
-        caret.classList.add("blank")
-        line.prepend(caret)
-      } else {
-        line.insertBefore(caret, line.children[1])
-      }
-    } else if (x === store.lines[y].length) {
-      if (store.lines[y].length === 0) {
-        line.prepend(caret)
-      } else {
-        line.appendChild(caret)
-      }
-    } else {
-      line.insertBefore(caret, character.previousSibling)
-    }
-  }
-
   static styles = css`
     :host {
       display: flex;
       flex-direction: column;
       cursor: text;
-      float: left;
       outline: none;
       white-space: nowrap;
     }
 
     .line {
-      position: relative;
+      display: flex;
+      min-height: var(--line-height);
       padding-left: 0.5em;
       color: #000d;
     }
 
-    .line[focused] {
+    .line[appFocused] {
       background-color: #0001;
       box-shadow: inset 0 0 1px #0004;
       color: #000e;
       font-weight: 450;
     }
 
-    .character {
-      padding: 10px 0;
-      padding: 0.6ch;
-      margin: -0.6ch;
-    }
+    .chunk {
+      position: relative;
+      z-index: 1;
+      white-space: pre;
 
-    .character:last-child {
-      padding-right: 0;
-      margin-right: 0;
+      /* box-shadow: 0 0 1px black; */
     }
-
-    /* .character[focused] {
-      color: green;
-    } */
 
     .caret {
       position: absolute;
+      z-index: 0;
       width: 3px;
-      height: 100%;
       animation: blink 1s step-end infinite;
       background: #0008;
-      user-select: none;
+      pointer-events: none;
       white-space: pre;
-    }
-
-    .caret.start {
-      margin-left: -1ch;
-    }
-
-    .caret.start.blank {
-      margin-left: 0;
-    }
-
-    .caret.end {
-      margin-left: 1ch;
     }
 
     @keyframes blink {
