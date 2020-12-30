@@ -1,15 +1,14 @@
 import { css, html, LitElement, TemplateResult } from "lit-element"
 
-export default class AppInterface extends LitElement {
-  static tag = "app-interface"
-
+export default class Root extends LitElement {
   render(): TemplateResult {
     return html`
-      <span class="lines">
+      <span id="main">
         <app-numberline></app-numberline>
-        <app-editor></app-editor>
+        <app-textarea></app-textarea>
       </span>
       <app-statusbar></app-statusbar>
+      <app-inputhandler></app-inputhandler>
     `
   }
 
@@ -18,19 +17,22 @@ export default class AppInterface extends LitElement {
       display: flex;
       height: 100%;
       flex-direction: column;
-      font-family: "SF Mono", "Courier", monospace;
+      font-family: "SF Mono", "Courier New", monospace;
+      font-size: 16px;
     }
 
-    .lines {
+    #main {
+      --focused-font-weight: 450;
+
       display: flex;
-      overflow: auto;
+      overflow: hidden;
       flex: 1;
-      line-height: var(--editor-line-height);
+      line-height: 28px;
     }
 
     ::-webkit-scrollbar {
-      width: 0.7em;
-      height: 0.7em;
+      width: 0.6em;
+      height: 0.6em;
       background-color: transparent;
     }
 

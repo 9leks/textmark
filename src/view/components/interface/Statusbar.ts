@@ -1,12 +1,10 @@
 import { MobxReactionUpdate } from "@adobe/lit-mobx"
 import { css, html, LitElement, TemplateResult } from "lit-element"
-import * as store from "../store"
+import store from "../../store"
 
-export default class AppStatusbar extends MobxReactionUpdate(LitElement) {
-  static tag = "app-statusbar"
-
+export default class Statusbar extends MobxReactionUpdate(LitElement) {
   render(): TemplateResult {
-    return html`<div class="position">${store.cursor.x}:${store.cursor.y}</div>`
+    return html`<div class="position">${store.x}:${store.y}</div>`
   }
 
   static styles = css`

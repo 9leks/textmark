@@ -13,12 +13,12 @@ const dummy = {
     "",
     "Some simple sentences have a single subject and verb, but the subject isn't stated in the sentence. Instead, the reader knows who the subject is from context.",
   ],
-  cursor: { x: 0, y: 0 },
+  coords: { x: 0, y: 0 },
 }
 
 contextBridge.exposeInMainWorld("api", {
-  onReady: (send: (payload: { lines: string[]; cursor: { x: number; y: number } }) => void) => {
-    const payload = { lines: dummy.lines, cursor: dummy.cursor }
+  onReady: (send: (payload: { lines: string[]; coords: { x: number; y: number } }) => void) => {
+    const payload = { lines: dummy.lines, coords: dummy.coords }
     send(payload)
   },
   os: (): string => process.platform,
