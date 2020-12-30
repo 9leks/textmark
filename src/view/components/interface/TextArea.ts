@@ -3,6 +3,14 @@ import { css, html, LitElement, TemplateResult } from "lit-element"
 import store from "../../store"
 import InputHandler from "../inputhandler/InputHandler"
 
+function isLine(line: TextAreaElement): line is LineElement {
+  return (line as LineElement).appOffsetY !== undefined
+}
+
+function isChar(char: TextAreaElement): char is CharElement {
+  return (char as CharElement).appOffsetX !== undefined
+}
+
 export default class TextArea extends MobxReactionUpdate(LitElement) {
   constructor() {
     super()
@@ -20,25 +28,18 @@ export default class TextArea extends MobxReactionUpdate(LitElement) {
     const { x, y } = store
     this.setCaret(x, y)
   }
-  
-  // todo double click selection
-  wrappedLines() {
-    const next = [...store.lines]
-    return next
-  }
 
   render(): TemplateResult {
-    this.wrappedLines()
     return html`
       ${store.lines.map((line, y) => {
         const focused = y === store.y
         const newline = html`<br />`
-        return html`<span class="line" ?focused=${focused} .y=${y}
+        return html`<span class="line" ?focused=${focused} .appOffsetY=${y}
           >${!line
             ? newline
             : [...line].map((character, x) => {
                 const focused = x === store.x && y === store.y
-                return html`<span class="character" ?focused=${focused} .x=${x}>${character}</span>`
+                return html`<span class="character" ?focused=${focused} .appOffsetX=${x}>${character}</span>`
               })}</span
         >`
       })}
@@ -47,10 +48,14 @@ export default class TextArea extends MobxReactionUpdate(LitElement) {
 
   handleMouseDown(evt: MouseEvent) {
     const el = <TextAreaElement>evt.composedPath()[0]
-    const type = el.className
-    if (["line", "character"].includes(type)) {
-      const { lines } = store
-      const [x, y] = type === "line" ? [lines[el.y].length, el.y] : [el.x, (<TextAreaElement>el.parentElement).y]
+
+    if (isLine(el)) {
+      const x = store.lines[el.appOffsetY].length
+      const y = el.appOffsetY
+      store.setCoords(x, y)
+    } else if (isChar(el)) {
+      const x = el.appOffsetX
+      const y = el.parentElement.appOffsetY
       store.setCoords(x, y)
     }
   }
@@ -68,23 +73,25 @@ export default class TextArea extends MobxReactionUpdate(LitElement) {
 
   handleMouseUp(evt: MouseEvent) {
     const selection = this.shadowRoot.getSelection()
+
     if (selection.toString().length > 0) {
       const range = selection.getRangeAt(0)
-      const end = <TextAreaElement>range.startContainer.parentElement
-      const start = <TextAreaElement>range.endContainer.parentElement
-      const backwards = selection.anchorNode !== selection.getRangeAt(0).startContainer
+      const end = <CharElement>range.startContainer.parentElement
+      const start = <CharElement>range.endContainer.parentElement
 
+      const backwards = selection.anchorNode !== selection.getRangeAt(0).startContainer
       const focusedEl = backwards ? end : start
 
       if (focusedEl) {
-        const x = focusedEl.x + (backwards && selection.focusOffset !== 1 ? 0 : 1)
-        const y = (<TextAreaElement>focusedEl.parentElement).y
+        const x = focusedEl.appOffsetX + (backwards && selection.focusOffset !== 1 ? 0 : 1)
+        const y = focusedEl.parentElement.appOffsetY
         store.setCoords(x, y)
       } else {
         const target = <TextAreaElement>evt.composedPath()[0]
-        if (target.className === "line") {
+
+        if (isLine(target)) {
           const x = 0
-          const y = target.y
+          const y = target.appOffsetY
           store.setCoords(x, y)
         } else {
           const lineHeight = Number(getComputedStyle(this).getPropertyValue("--line-height").slice(0, -2))
@@ -116,11 +123,9 @@ export default class TextArea extends MobxReactionUpdate(LitElement) {
     const line = this.shadowRoot.children[y]
     const character = line.children[x]
 
-    const caret = <TextAreaElement>document.createElement("span")
+    const caret = <HTMLSpanElement>document.createElement("span")
     caret.innerHTML = "\u00a0"
     caret.className = "caret"
-    caret.x = x
-    caret.y = y
 
     if (x === 0) {
       caret.classList.add("start")

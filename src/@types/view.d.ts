@@ -4,8 +4,15 @@ interface ElectronWindowParams {
   devTools?: boolean
 }
 
-interface TextAreaElement extends HTMLSpanElement {
-  y: number
-  x?: number
+interface LineElement extends HTMLSpanElement {
+  appOffsetY: number
   focused: boolean
 }
+
+interface CharElement extends HTMLSpanElement {
+  appOffsetX: number
+  appFocused: boolean
+  parentElement: LineElement
+}
+
+type TextAreaElement = LineElement | CharElement
