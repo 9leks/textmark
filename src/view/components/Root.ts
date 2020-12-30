@@ -23,11 +23,12 @@ export default class Root extends LitElement {
 
     #main {
       --focused-font-weight: 450;
+      --line-height: 28px;
 
       display: flex;
-      overflow: hidden;
+      overflow: auto;
       flex: 1;
-      line-height: 28px;
+      line-height: var(--line-height);
     }
 
     ::-webkit-scrollbar {

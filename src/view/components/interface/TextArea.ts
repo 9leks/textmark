@@ -20,8 +20,15 @@ export default class TextArea extends MobxReactionUpdate(LitElement) {
     const { x, y } = store
     this.setCaret(x, y)
   }
+  
+  // todo double click selection
+  wrappedLines() {
+    const next = [...store.lines]
+    return next
+  }
 
   render(): TemplateResult {
+    this.wrappedLines()
     return html`
       ${store.lines.map((line, y) => {
         const focused = y === store.y
@@ -59,33 +66,33 @@ export default class TextArea extends MobxReactionUpdate(LitElement) {
     }
   }
 
-  // TODO: fix
-
   handleMouseUp(evt: MouseEvent) {
     const selection = this.shadowRoot.getSelection()
     if (selection.toString().length > 0) {
-      const target = <TextAreaElement>evt.target
-      const focus = <TextAreaElement>selection.focusNode.parentElement
+      const range = selection.getRangeAt(0)
+      const end = <TextAreaElement>range.startContainer.parentElement
+      const start = <TextAreaElement>range.endContainer.parentElement
       const backwards = selection.anchorNode !== selection.getRangeAt(0).startContainer
 
-      if (!focus) {
-        const range = selection.getRangeAt(0)
-        const start = <TextAreaElement>range.startContainer
-        const end = <TextAreaElement>range.endContainer
-        const node = <TextAreaElement>(start.className === "line" ? start : end)
-        const y = node.y
-        store.setCoords(0, y)
-      } else if (focus.className === "line" && backwards) {
-        const y = focus.y
-        store.setCoords(store.lines[y].length, y)
-      } else if (target.className === "line") {
-        const y = target.y
-        store.setCoords(0, y)
-      } else if (focus.className === "character" && target.classList.length > 0) {
-        const x = focus.x
-        const line = <TextAreaElement>focus.parentElement
-        const y = line.y
-        store.setCoords(backwards ? x : x + 1, y)
+      const focusedEl = backwards ? end : start
+
+      if (focusedEl) {
+        const x = focusedEl.x + (backwards && selection.focusOffset !== 1 ? 0 : 1)
+        const y = (<TextAreaElement>focusedEl.parentElement).y
+        store.setCoords(x, y)
+      } else {
+        const target = <TextAreaElement>evt.composedPath()[0]
+        if (target.className === "line") {
+          const x = 0
+          const y = target.y
+          store.setCoords(x, y)
+        } else {
+          const lineHeight = Number(getComputedStyle(this).getPropertyValue("--line-height").slice(0, -2))
+          var offset = this.parentElement.scrollTop
+          const x = 0
+          const y = Math.floor((offset + evt.pageY) / lineHeight)
+          store.setCoords(x, y)
+        }
       }
     }
   }
@@ -139,9 +146,8 @@ export default class TextArea extends MobxReactionUpdate(LitElement) {
       display: flex;
       flex-direction: column;
       cursor: text;
+      float: left;
       outline: none;
-      overflow-x: auto;
-      overflow-y: auto;
       white-space: nowrap;
     }
 
@@ -179,6 +185,7 @@ export default class TextArea extends MobxReactionUpdate(LitElement) {
       height: 100%;
       animation: blink 1s step-end infinite;
       background: #0008;
+      user-select: none;
       white-space: pre;
     }
 

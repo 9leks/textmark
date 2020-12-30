@@ -14,16 +14,6 @@ export default class NumberLine extends MobxReactionUpdate(LitElement) {
 
   constructor() {
     super()
-    this.addEventListener("mousemove", this.handleMouseMove)
-  }
-
-  // TODO: fix
-
-  handleMouseMove(evt: MouseEvent) {
-    const textArea = this.nextElementSibling.shadowRoot
-    const selection = textArea.getSelection()
-    if (evt.buttons === 1 && selection.toString().length > 0) {
-    }
   }
 
   static styles = css`
@@ -31,7 +21,7 @@ export default class NumberLine extends MobxReactionUpdate(LitElement) {
       min-width: 6ch;
       flex-direction: column;
       box-shadow: 1px 0 3px -1px #0002;
-      user-select: none;
+      pointer-events: none;
     }
 
     .line {
