@@ -6,12 +6,12 @@ export default class InputHandler extends MobxReactionUpdate(LitElement) {
   static tag = 'app-input-handler'
 
   focus(): void {
-    const inputHandler = <HTMLTextAreaElement>this.shadowRoot.querySelector('.inputhandler')
+    const inputHandler = this.shadowRoot.querySelector('.inputhandler')
     inputHandler.focus()
   }
 
   handleInput(evt: InputEvent): void {
-    const target = <HTMLTextAreaElement>evt.target
+    const target = evt.target as HTMLTextAreaElement
     const char = target.value
     target.value = ''
 

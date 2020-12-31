@@ -9,11 +9,11 @@ class Store {
   x: number = 0
   y: number = 0
 
-  setLines(lines: string[]) {
+  setLines(lines: string[]): void {
     this.lines = lines
   }
 
-  setCoords(x: number, y: number) {
+  setCoords(x: number, y: number): void {
     this.x = x
     this.y = y
   }

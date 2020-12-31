@@ -6,11 +6,11 @@ import InputHandler from '../inputhandler/InputHandler'
 const MAX_CHUNK_SIZE = 30
 
 function isLine(line: TextAreaElement): line is LineElement {
-  return (<LineElement>line).appOffsetY !== undefined
+  return (line as LineElement).appOffsetY !== undefined
 }
 
 function isChunk(chunk: TextAreaElement): chunk is ChunkElement {
-  return (<ChunkElement>chunk).appChunkN !== undefined
+  return (chunk as ChunkElement).appChunkN !== undefined
 }
 
 export default class TextArea extends MobxReactionUpdate(LitElement) {
@@ -19,37 +19,36 @@ export default class TextArea extends MobxReactionUpdate(LitElement) {
     this.tabIndex = -1
   }
 
-  firstUpdated() {
+  firstUpdated(): void {
     document.addEventListener('mouseup', (evt: MouseEvent) => this.handleMouseUp(evt))
     this.addEventListener('mousedown', this.handleMouseDown)
     this.addEventListener('mousemove', this.handleMouseMove)
     this.addEventListener('keydown', this.handleKeyDown)
   }
 
-  updated() {
+  updated(): void {
     this.setCaret(store.x, store.y)
   }
 
   render(): TemplateResult {
     return html`
       ${store.lines.map((line, y) => {
+        // eslint-disable-next-line
         store.x // for mobx store tracking
         const chunks = line.match(new RegExp(`.{1,${MAX_CHUNK_SIZE}}`, 'g'))
 
         return html`
           <div class="line" .appOffsetY=${y} ?appFocused=${y === store.y}>
-            ${!chunks
-              ? html`<br />`
-              : chunks.map((chunk, chunkOffset) => {
-                  return html`<span class="chunk" .appChunkN=${chunkOffset}>${chunk}</span>`
-                })}
+            ${chunks?.map((chunk, chunkOffset) => {
+              return html`<span class="chunk" .appChunkN=${chunkOffset}>${chunk}</span>`
+            }) ?? html`<br />`}
           </div>
         `
       })}
     `
   }
 
-  getCharacterWidth() {
+  getCharacterWidth(): number {
     const fontSize = Number(getComputedStyle(this).getPropertyValue('--font-size').slice(0, -2))
     const letterSpacing = 1
     return letterSpacing + 0.5 * fontSize + letterSpacing
@@ -57,8 +56,8 @@ export default class TextArea extends MobxReactionUpdate(LitElement) {
 
   setCaret(x: number, y: number): void {
     const precaret = this.shadowRoot.querySelector('.caret')
-    if (precaret) {
-      const line = <LineElement>precaret.parentElement.parentElement
+    if (this.shadowRoot.contains(precaret)) {
+      const line = precaret.parentElement.parentElement as LineElement
       precaret.remove()
 
       if (line.childElementCount === 1 && !line.firstElementChild.hasChildNodes()) {
@@ -80,8 +79,8 @@ export default class TextArea extends MobxReactionUpdate(LitElement) {
       line.children[chunkN].remove()
     }
 
-    if (!line.children[chunkN]) {
-      const chunk = <ChunkElement>document.createElement('span')
+    if (line.children[chunkN] === undefined) {
+      const chunk = document.createElement('span') as ChunkElement
       chunk.className = 'chunk'
       chunk.appChunkN = chunkN
       line.append(chunk)
@@ -91,8 +90,8 @@ export default class TextArea extends MobxReactionUpdate(LitElement) {
     chunk.append(caret)
   }
 
-  handleMouseDown(evt: MouseEvent) {
-    const el = <TextAreaElement>evt.composedPath()[0]
+  handleMouseDown(evt: MouseEvent): void {
+    const el = evt.composedPath()[0] as TextAreaElement
     const charWidth = this.getCharacterWidth()
     const leftOffset = Math.max(0, evt.pageX - el.getBoundingClientRect().left)
 
@@ -108,18 +107,18 @@ export default class TextArea extends MobxReactionUpdate(LitElement) {
     }
   }
 
-  handleMouseMove(evt: MouseEvent) {
+  handleMouseMove(evt: MouseEvent): void {
     if (evt.buttons === 1) {
       if (this.shadowRoot.getSelection().toString().length > 0) {
-        const caret = this.shadowRoot.querySelector('.caret')
-        if (caret) {
+        const caret = this.shadowRoot.querySelector<HTMLSpanElement>('.caret')
+        if (caret === undefined) {
           caret.remove()
         }
       }
     }
   }
 
-  handleMouseUp(evt: MouseEvent) {
+  handleMouseUp(evt: MouseEvent): void {
     const selection = this.shadowRoot.getSelection()
 
     if (selection.toString().length > 0) {

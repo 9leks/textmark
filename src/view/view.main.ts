@@ -2,7 +2,9 @@ import components from './components'
 import store from './store'
 
 for (const { component, tag } of components) {
-  customElements.get(tag) || customElements.define(tag, component)
+  if (!(customElements.get(tag) as boolean)) {
+    customElements.define(tag, component)
+  }
 }
 
 window.api.onReady((payload: { lines: string[]; coords: { x: number; y: number } }) => {
