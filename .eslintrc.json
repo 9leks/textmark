@@ -5,15 +5,32 @@
     "es2021": true,
     "node": true
   },
-  "extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended"],
+  "extends": ["standard-with-typescript"],
   "parserOptions": {
     "parser": "@typescript-eslint/parser",
+    "project": "./tsconfig.json",
     "ecmaVersion": 12,
     "sourceType": "module"
   },
   "plugins": ["@typescript-eslint"],
   "rules": {
-    "@typescript-eslint/no-var-requires": "off"
+    "@typescript-eslint/no-var-requires": "off",
+    "@typescript-eslint/space-before-function-paren": "off",
+    "@typescript-eslint/no-redeclare": "off",
+    "@typescript-eslint/member-delimiter-style": [
+      "error",
+      {
+        "multiline": {
+          "delimiter": "none",
+          "requireLast": true
+        },
+        "singleline": {
+          "delimiter": "semi",
+          "requireLast": false
+        }
+      }
+    ],
+    "comma-dangle": "off"
   },
   "ignorePatterns": ["lib", "build"]
 }

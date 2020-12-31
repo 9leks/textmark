@@ -1,14 +1,14 @@
-import { app, BrowserWindow } from "electron"
-import * as path from "path"
+import { app, BrowserWindow } from 'electron'
+import * as path from 'path'
 
 export class ElectronWindow {
   static browser: BrowserWindow
 
   static async whenReady(params: ElectronWindowParams): Promise<void> {
-    app.on("ready", ElectronWindow.createWindow)
+    app.on('ready', ElectronWindow.createWindow)
     await app.whenReady()
 
-    app.on("window-all-closed", ElectronWindow.onClose(params.onClose))
+    app.on('window-all-closed', ElectronWindow.onClose(params.onClose))
     ElectronWindow.openWindow(params.url)
 
     if (params.devTools) {
@@ -22,7 +22,7 @@ export class ElectronWindow {
         spellcheck: false,
         sandbox: true,
         contextIsolation: true,
-        preload: path.resolve(__dirname, "electron.preload.js"),
+        preload: path.resolve(__dirname, 'electron.preload.js'),
       },
     })
   }
@@ -46,8 +46,8 @@ export class ElectronWindow {
   }
 
   private static openDevTools() {
-    ElectronWindow.browser.webContents.once("did-finish-load", () => {
-      ElectronWindow.browser.webContents.openDevTools({ mode: "detach" })
+    ElectronWindow.browser.webContents.once('did-finish-load', () => {
+      ElectronWindow.browser.webContents.openDevTools({ mode: 'detach' })
       ElectronWindow.browser.focus()
     })
   }

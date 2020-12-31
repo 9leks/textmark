@@ -1,6 +1,6 @@
-import { MobxReactionUpdate } from "@adobe/lit-mobx"
-import { css, html, LitElement, TemplateResult } from "lit-element"
-import store from "../../store"
+import { MobxReactionUpdate } from '@adobe/lit-mobx'
+import { css, html, LitElement, TemplateResult } from 'lit-element'
+import store from '../../store'
 
 export default class NumberLine extends MobxReactionUpdate(LitElement) {
   render(): TemplateResult {

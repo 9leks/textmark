@@ -1,5 +1,5 @@
-import components from "./components"
-import store from "./store"
+import components from './components'
+import store from './store'
 
 for (const { component, tag } of components) {
   customElements.get(tag) || customElements.define(tag, component)

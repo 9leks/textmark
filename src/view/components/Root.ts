@@ -1,4 +1,4 @@
-import { css, html, LitElement, TemplateResult } from "lit-element"
+import { css, html, LitElement, TemplateResult } from 'lit-element'
 
 export default class Root extends LitElement {
   render(): TemplateResult {
@@ -19,7 +19,7 @@ export default class Root extends LitElement {
       display: flex;
       height: 100%;
       flex-direction: column;
-      font-family: "SF Mono", "Courier New", monospace;
+      font-family: 'SF Mono', 'Courier New', monospace;
       font-size: var(--font-size);
     }
 

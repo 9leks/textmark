@@ -1,7 +1,7 @@
-import { MobxReactionUpdate } from "@adobe/lit-mobx"
-import { css, html, LitElement, TemplateResult } from "lit-element"
-import store from "../../store"
-import InputHandler from "../inputhandler/InputHandler"
+import { MobxReactionUpdate } from '@adobe/lit-mobx'
+import { css, html, LitElement, TemplateResult } from 'lit-element'
+import store from '../../store'
+import InputHandler from '../inputhandler/InputHandler'
 
 const MAX_CHUNK_SIZE = 30
 
@@ -20,10 +20,10 @@ export default class TextArea extends MobxReactionUpdate(LitElement) {
   }
 
   firstUpdated() {
-    document.addEventListener("mouseup", (evt: MouseEvent) => this.handleMouseUp(evt))
-    this.addEventListener("mousedown", this.handleMouseDown)
-    this.addEventListener("mousemove", this.handleMouseMove)
-    this.addEventListener("keydown", this.handleKeyDown)
+    document.addEventListener('mouseup', (evt: MouseEvent) => this.handleMouseUp(evt))
+    this.addEventListener('mousedown', this.handleMouseDown)
+    this.addEventListener('mousemove', this.handleMouseMove)
+    this.addEventListener('keydown', this.handleKeyDown)
   }
 
   updated() {
@@ -34,7 +34,7 @@ export default class TextArea extends MobxReactionUpdate(LitElement) {
     return html`
       ${store.lines.map((line, y) => {
         store.x // for mobx store tracking
-        const chunks = line.match(new RegExp(`.{1,${MAX_CHUNK_SIZE}}`, "g"))
+        const chunks = line.match(new RegExp(`.{1,${MAX_CHUNK_SIZE}}`, 'g'))
 
         return html`
           <div class="line" .appOffsetY=${y} ?appFocused=${y === store.y}>
@@ -50,27 +50,27 @@ export default class TextArea extends MobxReactionUpdate(LitElement) {
   }
 
   getCharacterWidth() {
-    const fontSize = Number(getComputedStyle(this).getPropertyValue("--font-size").slice(0, -2))
+    const fontSize = Number(getComputedStyle(this).getPropertyValue('--font-size').slice(0, -2))
     const letterSpacing = 1
     return letterSpacing + 0.5 * fontSize + letterSpacing
   }
 
   setCaret(x: number, y: number): void {
-    const precaret = this.shadowRoot.querySelector(".caret")
+    const precaret = this.shadowRoot.querySelector('.caret')
     if (precaret) {
       const line = <LineElement>precaret.parentElement.parentElement
       precaret.remove()
 
       if (line.childElementCount === 1 && !line.firstElementChild.hasChildNodes()) {
-        const br = document.createElement("br")
+        const br = document.createElement('br')
         line.append(br)
       }
     }
 
-    const caret = document.createElement("span")
+    const caret = document.createElement('span')
     const left = this.getCharacterWidth() * (x % MAX_CHUNK_SIZE)
-    caret.className = "caret"
-    caret.innerText = "\u00a0"
+    caret.className = 'caret'
+    caret.innerText = '\u00a0'
     caret.style.left = `${left - 3}px`
 
     const line = this.shadowRoot.children[y]
@@ -81,8 +81,8 @@ export default class TextArea extends MobxReactionUpdate(LitElement) {
     }
 
     if (!line.children[chunkN]) {
-      const chunk = <ChunkElement>document.createElement("span")
-      chunk.className = "chunk"
+      const chunk = <ChunkElement>document.createElement('span')
+      chunk.className = 'chunk'
       chunk.appChunkN = chunkN
       line.append(chunk)
     }
@@ -111,7 +111,7 @@ export default class TextArea extends MobxReactionUpdate(LitElement) {
   handleMouseMove(evt: MouseEvent) {
     if (evt.buttons === 1) {
       if (this.shadowRoot.getSelection().toString().length > 0) {
-        const caret = this.shadowRoot.querySelector(".caret")
+        const caret = this.shadowRoot.querySelector('.caret')
         if (caret) {
           caret.remove()
         }
@@ -128,8 +128,8 @@ export default class TextArea extends MobxReactionUpdate(LitElement) {
 
   handleKeyDown(evt: KeyboardEvent): void {
     const inputHandler = <InputHandler>this.parentNode.parentNode.lastElementChild
-    if (!["Control", "Alt", "Meta", "CapsLock", "Shift"].includes(evt.key)) {
-      if (!(window.api.os() === "darwin" ? evt.metaKey : evt.ctrlKey)) {
+    if (!['Control', 'Alt', 'Meta', 'CapsLock', 'Shift'].includes(evt.key)) {
+      if (!(window.api.os() === 'darwin' ? evt.metaKey : evt.ctrlKey)) {
         inputHandler.focus()
       }
       inputHandler.handleKeyDown(evt)
