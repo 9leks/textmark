@@ -1,13 +1,13 @@
 import { observer } from 'mobx-react-lite'
 import React, { FunctionComponent, useContext } from 'react'
-import { StoreContext } from '../view.main'
+import { StoreContext } from '../index'
 import { TextArea } from './react/components'
 
 const Root: FunctionComponent = () => {
   const store = useContext(StoreContext)
   const { x, y, text } = store
 
-  const handleChange = (e: CustomEvent<InputEvent>): void => {
+  const handleChange = (e: CustomEvent<XInputEvent>): void => {
     const { value, x, y } = e.detail
     store.setText(value)
     store.setCoords(x, y)

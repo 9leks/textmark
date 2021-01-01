@@ -2,12 +2,13 @@
   "name": "textmark",
   "version": "0.0.1",
   "license": "MIT",
-  "main": "build/electron/electron.main.js",
+  "main": "build/electron/electron-main.js",
   "scripts": {
     "build:electron": "webpack --config webpack.electron.config.js",
     "serve:electron": "electron .",
-    "serve:view": "webpack-dev-server --config webpack.view.config.js",
-    "start": "npm run build:electron && concurrently \"npm run serve:electron\" \"npm run serve:view\" && rm -r build"
+    "serve:view": "webpack-dev-server --config webpack.web.config.js",
+    "start": "npm run build:electron && concurrently \"npm run serve:electron\" \"npm run serve:view\" && rm -r build",
+    "lint": "eslint --ext .js,.jsx,.ts,.tsx src"
   },
   "devDependencies": {
     "@babel/core": "^7.12.10",
