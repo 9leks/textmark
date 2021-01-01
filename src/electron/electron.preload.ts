@@ -17,8 +17,8 @@ const dummy = {
 }
 
 contextBridge.exposeInMainWorld('api', {
-  onReady: (send: (payload: { lines: string[]; coords: { x: number; y: number } }) => void) => {
-    const payload = { lines: dummy.lines, coords: dummy.coords }
+  onReady: (send: (payload: { text: string; coords: { x: number; y: number } }) => void) => {
+    const payload = { text: dummy.lines.join('\n'), coords: dummy.coords }
     send(payload)
   },
   os: (): string => process.platform,

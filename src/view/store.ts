@@ -5,12 +5,12 @@ class Store {
     makeAutoObservable(this)
   }
 
-  lines: string[] = []
-  x: number = 0
-  y: number = 0
+  text = ''
+  x = 0
+  y = 0
 
-  setLines(lines: string[]): void {
-    this.lines = lines
+  setText(text: string): void {
+    this.text = text
   }
 
   setCoords(x: number, y: number): void {

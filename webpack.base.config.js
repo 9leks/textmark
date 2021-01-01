@@ -2,12 +2,12 @@ const base = {
   mode: 'development',
   devtool: 'source-map',
   resolve: {
-    extensions: ['.ts', '.js'],
+    extensions: ['.ts', '.tsx', '.js'],
   },
   module: {
     rules: [
       {
-        test: /\.ts$/,
+        test: /\.tsx?$/,
         include: /src/,
         exclude: /node_modules/,
         use: [

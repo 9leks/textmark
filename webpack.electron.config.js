@@ -4,6 +4,7 @@ const base = require('./webpack.base.config.js')
 
 const main = {
   entry: path.resolve(__dirname, 'src/electron/electron.main.ts'),
+  experiments: { topLevelAwait: true },
   target: 'electron-main',
   output: {
     path: path.resolve(__dirname, 'build/electron'),

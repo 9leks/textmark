@@ -1,10 +1,10 @@
-import { ElectronWindow } from './electron.window'
+import { whenReady } from './electron.window'
 
-function onClose() {
+function onClose(): void {
   console.log('Textmark closed!')
 }
 
-ElectronWindow.whenReady({
+await whenReady({
   url: 'http://localhost:8000/',
   devTools: true,
   onClose,
