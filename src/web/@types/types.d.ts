@@ -1,7 +1,15 @@
+declare interface Conf {
+  lineHeight: string
+  fontSize: string
+  fontFamily: string
+}
+
 declare interface Store {
   text: string
+  lineCount: number
   x: number
   y: number
+  conf: Conf
   setText: (text: string) => void
   setCoords: (x: number, y: number) => void
 }

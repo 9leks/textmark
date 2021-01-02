@@ -5,6 +5,8 @@
     "no-eol-whitespace": null,
     "no-missing-end-of-source-newline": null,
     "selector-type-no-unknown": null,
-    "no-descending-specificity": null
+    "no-descending-specificity": null,
+    "value-keyword-case": null,
+    "font-family-no-missing-generic-family-keyword": null
   }
 }

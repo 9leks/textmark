@@ -46,12 +46,6 @@ export default class XTextArea extends LitElement {
 
   connectedCallback(): void {
     super.connectedCallback()
-    document.addEventListener('mouseup', (e: MouseEvent) => this.handleMouseUp(e))
-    this.addEventListener('mousedown', this.handleMouseDown)
-    this.addEventListener('mousemove', this.handleMouseMove)
-    this.addEventListener('keydown', this.handleKeyDown)
-    this.addEventListener('input', this.handleInput)
-
     this.tabIndex = -1
     this.lines = this.value.split('\n')
     this.style.fontSize = this.fontSize
@@ -59,9 +53,13 @@ export default class XTextArea extends LitElement {
     this.style.lineHeight = this.lineHeight
   }
 
-  disconnectedCallback(): void {
-    document.removeEventListener('mouseup', this.handleMouseUp)
-    super.disconnectedCallback()
+  firstUpdated(): void {
+    this.shadowRoot.querySelector('#lines').addEventListener('scroll', (e: Event) => this.handleScroll(e))
+    this.addEventListener('mouseup', (e: MouseEvent) => this.handleMouseUp(e))
+    this.addEventListener('mousedown', this.handleMouseDown)
+    this.addEventListener('mousemove', this.handleMouseMove)
+    this.addEventListener('keydown', this.handleKeyDown)
+    this.addEventListener('input', this.handleInput)
   }
 
   updated(props: Map<string, string | string[] | number>): void {
@@ -74,17 +72,21 @@ export default class XTextArea extends LitElement {
 
   render(): TemplateResult {
     return html`
-      ${this.lines.map((line, y) => {
-        const chunks = line.match(new RegExp(`.{1,${this.chunkSize}}`, 'g'))
-
-        return html`
-          <div class="line" .app-offset-y=${y} ?app-focused=${y === this.y}>
-            ${chunks?.map((chunk, chunkOffset) => {
-              return html`<span class="chunk" .app-offset-chunk=${chunkOffset}>${chunk}</span>`
-            }) ?? html`<br />`}
-          </div>
-        `
-      })}
+      <div id="numberline">
+        ${this.lines.map((_, y: number) => html`<div class="line-number" ?app-focused=${y === this.y}>${y}</div>`)}
+      </div>
+      <div id="lines">
+        ${this.lines.map((line, y) => {
+          const chunks = line.match(new RegExp(`.{1,${this.chunkSize}}`, 'g'))
+          return html`
+            <div class="line" .app-offset-y=${y} ?app-focused=${y === this.y}>
+              ${chunks?.map((chunk, chunkOffset) => {
+                return html`<span class="chunk" .app-offset-chunk=${chunkOffset}>${chunk}</span>`
+              }) ?? html`<br />`}
+            </div>
+          `
+        })}
+      </div>
       <textarea id="inputhandler" autofocus></textarea>
     `
   }
@@ -128,7 +130,7 @@ export default class XTextArea extends LitElement {
     caret.innerText = '\u00a0'
     caret.style.left = `${left - 3}px`
 
-    const line = this.shadowRoot.children[y]
+    const line = this.shadowRoot.querySelector('#lines').children[y]
     const chunkN = Math.floor(x / this.chunkSize)
 
     if (line.children[chunkN] instanceof HTMLBRElement) {
@@ -191,6 +193,12 @@ export default class XTextArea extends LitElement {
     const { x, y, lines } = this
     this.lines = [...lines.slice(0, y), lines[y].slice(0, x) + input + lines[y].slice(x), ...lines.slice(y + 1)]
     this.x = this.x + 1
+  }
+
+  handleScroll(e: Event): void {
+    const lines = e.target as HTMLDivElement
+    const numberline = this.shadowRoot.querySelector<HTMLDivElement>('#numberline')
+    numberline.scrollTop = lines.scrollTop
   }
 
   handleKeyDown(e: KeyboardEvent): void {
@@ -340,12 +348,68 @@ export default class XTextArea extends LitElement {
   }
 
   static styles = css`
+    ::selection {
+      background: transparent;
+    }
+
     :host {
       display: flex;
-      flex-direction: column;
+      overflow: hidden;
+      width: 100%;
+      height: 100%;
       cursor: text;
       outline: none;
       white-space: nowrap;
+    }
+
+    #numberline {
+      position: relative;
+      min-width: 6ch;
+      height: auto;
+      box-shadow: 1px 0 3px -1px #0002;
+      color: #888;
+      direction: rtl;
+      overflow-y: auto;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    #numberline::-webkit-scrollbar {
+      display: none;
+    }
+
+    .line-number {
+      padding-right: 1.5ch;
+      font-size: 0.9em;
+    }
+
+    .line-number[app-focused] {
+      color: #000000ea;
+      font-weight: 450;
+    }
+
+    #lines {
+      overflow: overlay;
+      width: 100%;
+      height: 100%;
+      overscroll-behavior-y: none;
+    }
+
+    #lines::-webkit-scrollbar {
+      width: 10px;
+      height: 10px;
+    }
+
+    #lines::-webkit-scrollbar-thumb {
+      background-color: #0003;
+    }
+
+    #lines::-webkit-scrollbar-thumb:hover {
+      background-color: #0006;
+    }
+
+    #lines::-webkit-scrollbar-corner {
+      background-color: transparent;
     }
 
     .line {
@@ -364,9 +428,9 @@ export default class XTextArea extends LitElement {
     .chunk {
       position: relative;
       z-index: 1;
-      display: block;
-      box-shadow: 0 0 1px black;
       white-space: pre;
+
+      /* box-shadow: 0 0 1px black; */
     }
 
     #caret {

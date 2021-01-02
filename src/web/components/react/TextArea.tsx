@@ -1,21 +1,18 @@
-import React, { FunctionComponent, useEffect, useRef } from 'react'
+import React, { FunctionComponent, useContext, useEffect, useRef } from 'react'
+import { StoreContext } from '../../index'
 import XTextArea from '../web/x-textarea'
 
 if (!customElements.get('x-textarea')) {
   customElements.define('x-textarea', XTextArea)
 }
 
-interface TextAreaProps {
-  value: string
+interface ITextArea {
   onChange: (e: CustomEvent<XInputEvent>) => void
-  fontSize: string
-  fontFamily: string
-  lineHeight: string
-  x: number
-  y: number
 }
 
-const TextArea: FunctionComponent<TextAreaProps> = ({ value, onChange, fontSize, fontFamily, lineHeight, x, y }) => {
+const TextArea: FunctionComponent<ITextArea> = ({ onChange }) => {
+  const { conf, x, y, text } = useContext(StoreContext)
+  const { lineHeight, fontSize, fontFamily } = conf
   const ref = useRef<XTextArea>()
 
   useEffect(() => {
@@ -27,9 +24,9 @@ const TextArea: FunctionComponent<TextAreaProps> = ({ value, onChange, fontSize,
   return (
     <x-textarea
       ref={ref}
-      value={value}
-      x={y}
-      y={x}
+      value={text}
+      x={x}
+      y={y}
       line-height={lineHeight}
       font-size={fontSize}
       font-family={fontFamily}

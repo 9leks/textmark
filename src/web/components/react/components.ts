@@ -1,6 +1,5 @@
-import NumberLine from './NumberLine'
-import StatusFooter from './StatusFooter'
+import Statusbar from './Statusbar'
 import TabHeader from './TabHeader'
 import TextArea from './TextArea'
 
-export { NumberLine, StatusFooter, TabHeader, TextArea }
+export { Statusbar, TabHeader, TextArea }
