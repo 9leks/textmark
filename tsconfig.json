@@ -1,6 +1,11 @@
 {
   "compilerOptions": {
+    "module": "esnext",
+    "jsx": "react",
     "moduleResolution": "node",
-    "target": "es6"
-  }
+    "target": "es2017",
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true
+  },
+  "include": ["src"]
 }

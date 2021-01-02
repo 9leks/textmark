@@ -1,6 +1,6 @@
 import { contextBridge } from 'electron'
 
-const dummy = {
+const _dummy = {
   lines: [
     'Hello. What is your name?',
     'An African elephant can weigh as much as 6 tons!',
@@ -16,10 +16,12 @@ const dummy = {
   coords: { x: 0, y: 0 },
 }
 
-contextBridge.exposeInMainWorld('api', {
-  onReady: (send: (payload: { lines: string[]; coords: { x: number; y: number } }) => void) => {
-    const payload = { lines: dummy.lines, coords: dummy.coords }
-    send(payload)
-  },
-  os: (): string => process.platform,
-})
+function onReady(send: (payload: Payload) => void): void {
+  const payload = { text: _dummy.lines.join('\n'), coords: _dummy.coords }
+  send(payload)
+}
+function os(): string {
+  return process.platform
+}
+
+contextBridge.exposeInMainWorld('api', { onReady, os })

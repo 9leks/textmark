@@ -1,6 +1,6 @@
 # Textmark
 
-Textmark is a simple text reader made with Electron and LitElement.
+Textmark is a simple text reader made with Electron, React and LitElement.
 
 ## Goals
 
