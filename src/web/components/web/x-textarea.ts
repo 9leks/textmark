@@ -66,7 +66,7 @@ export default class XTextArea extends LitElement {
     this.setCaret(this.x, this.y)
 
     if (['lines', 'y', 'x'].some((prop) => props.has(prop))) {
-      this.sendChangeEvent()
+      this.sendInputEvent()
     }
   }
 
@@ -91,7 +91,7 @@ export default class XTextArea extends LitElement {
     `
   }
 
-  sendChangeEvent(): void {
+  sendInputEvent(): void {
     this.dispatchEvent(
       new CustomEvent('on-input', {
         detail: {
@@ -177,7 +177,6 @@ export default class XTextArea extends LitElement {
     const selection = this.shadowRoot.getSelection()
 
     if (selection.toString().length > 0) {
-      console.log('Text selection not implemented')
     }
   }
 
@@ -348,10 +347,6 @@ export default class XTextArea extends LitElement {
   }
 
   static styles = css`
-    ::selection {
-      background: transparent;
-    }
-
     :host {
       display: flex;
       overflow: hidden;

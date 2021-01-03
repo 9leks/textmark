@@ -1,5 +1,6 @@
-import { app, BrowserWindow } from 'electron'
+import { app, BrowserWindow, clipboard } from 'electron'
 import * as path from 'path'
+import { createMenu } from './menu'
 
 await whenReady({
   url: 'http://localhost:8000/',
@@ -22,6 +23,27 @@ let _browser: BrowserWindow
 async function whenReady(params: ElectronWindowParams): Promise<void> {
   app.on('ready', createWindow(params))
   await app.whenReady()
+
+  createMenu({
+    onCopy() {
+      _browser.webContents.copy()
+
+      setTimeout(() => {
+        const cp = clipboard.readHTML()
+        const meta = "<meta charset='utf-8'>"
+
+        clipboard.writeText(
+          cp
+            .slice(meta.length)
+            .replace(/\s*(class|style|app-focused)(="[^"]*")?\s*/g, '')
+            .replace(/<div>(.*?)<\/div>/g, '$1\n')
+            .replace(/<span>(.*?)<\/span>/g, '$1')
+            .replace(/<(br|div)>/g, '')
+            .replace(/<span id="caret">.<\/span>/, '')
+        )
+      }, 50)
+    },
+  })
 
   app.on('window-all-closed', closeWindow(params.onClose))
   await openWindow(params.url)

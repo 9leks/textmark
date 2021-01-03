@@ -7,7 +7,7 @@ import { TextArea, Statusbar } from './react/components'
 const Root: FunctionComponent = () => {
   const store = useContext(StoreContext)
 
-  const handleChange = (e: CustomEvent<XInputEvent>): void => {
+  const handleInput = (e: CustomEvent<XInputEvent>): void => {
     const { value, x, y } = e.detail
     store.setText(value)
     store.setCoords(x, y)
@@ -15,7 +15,7 @@ const Root: FunctionComponent = () => {
 
   return (
     <Container>
-      <TextArea onChange={handleChange} />
+      <TextArea onInput={handleInput} />
       <Statusbar />
     </Container>
   )

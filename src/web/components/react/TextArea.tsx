@@ -7,17 +7,17 @@ if (!customElements.get('x-textarea')) {
 }
 
 interface ITextArea {
-  onChange: (e: CustomEvent<XInputEvent>) => void
+  onInput: (e: CustomEvent<XInputEvent>) => void
 }
 
-const TextArea: FunctionComponent<ITextArea> = ({ onChange }) => {
+const TextArea: FunctionComponent<ITextArea> = ({ onInput }) => {
   const { conf, x, y, text } = useContext(StoreContext)
   const { lineHeight, fontSize, fontFamily } = conf
   const ref = useRef<XTextArea>()
 
   useEffect(() => {
     ref.current?.addEventListener('on-input', (e: CustomEvent<XInputEvent>) => {
-      onChange(e)
+      onInput(e)
     })
   }, [ref])
 
