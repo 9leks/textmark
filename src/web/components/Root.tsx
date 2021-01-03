@@ -2,12 +2,12 @@ import styled from '@emotion/styled'
 import { observer } from 'mobx-react-lite'
 import React, { FunctionComponent, useContext } from 'react'
 import { StoreContext } from '../index'
-import { TextArea, Statusbar } from './react/components'
+import { Statusbar, TextArea } from './react/components'
 
 const Root: FunctionComponent = () => {
   const store = useContext(StoreContext)
 
-  const handleInput = (e: CustomEvent<XInputEvent>): void => {
+  const handleChange = (e: CustomEvent<XChangeEvent>): void => {
     const { value, x, y } = e.detail
     store.setText(value)
     store.setCoords(x, y)
@@ -15,7 +15,7 @@ const Root: FunctionComponent = () => {
 
   return (
     <Container>
-      <TextArea onInput={handleInput} />
+      <TextArea onChange={handleChange} />
       <Statusbar />
     </Container>
   )

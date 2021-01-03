@@ -6,8 +6,8 @@
   "scripts": {
     "build:electron": "webpack --config webpack.electron.config.js",
     "serve:electron": "electron .",
-    "serve:view": "webpack-dev-server --config webpack.web.config.js",
-    "start": "npm run build:electron && concurrently \"npm run serve:electron\" \"npm run serve:view\" && rm -r build",
+    "serve:web": "webpack-dev-server --config webpack.web.config.js",
+    "start": "npm run build:electron && concurrently \"npm run serve:electron\" \"npm run serve:web\" && rm -r build",
     "lint": "eslint --ext .js,.jsx,.ts,.tsx src"
   },
   "devDependencies": {
@@ -19,6 +19,7 @@
     "@babel/preset-react": "^7.12.10",
     "@babel/preset-typescript": "^7.12.7",
     "@babel/runtime": "^7.12.5",
+    "@types/html-to-text": "^6.0.0",
     "@types/react": "^17.0.0",
     "@types/react-dom": "^17.0.0",
     "@types/webpack-env": "^1.16.0",
@@ -48,6 +49,7 @@
   "dependencies": {
     "@emotion/react": "^11.1.4",
     "@emotion/styled": "^11.0.0",
+    "html-to-text": "^6.0.0",
     "lit-element": "^2.4.0",
     "mobx": "^6.0.4",
     "mobx-react-lite": "^3.1.6",

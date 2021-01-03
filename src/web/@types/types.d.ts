@@ -1,4 +1,4 @@
-declare interface XInputEvent {
+declare interface XChangeEvent {
   value: string
   x: number
   y: number
@@ -6,7 +6,7 @@ declare interface XInputEvent {
 
 declare interface TextAreaProps {
   value: string
-  onChange: (e: CustomEvent<XInputEvent>) => void
+  onChange: (e: CustomEvent<XChangeEvent>) => void
   fontSize: string
   fontFamily: string
   lineHeight: string
