@@ -1,5 +1,5 @@
 interface LineElement extends HTMLDivElement {
-  'app-offset-y': number
+  posY: number
   focused: number
   parentElement: HTMLDivElement
   previousElementSibling: LineElement
@@ -7,7 +7,7 @@ interface LineElement extends HTMLDivElement {
 }
 
 interface ChunkElement extends HTMLSpanElement {
-  'app-offset-x': number
+  posX: number
   parentElement: LineElement
   previousElementSibling: ChunkElement
   nextElementSibling: ChunkElement
