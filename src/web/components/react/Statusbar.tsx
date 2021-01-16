@@ -26,6 +26,7 @@ const Container = styled.div`
   font-family: 'SF Mono', 'Courier New', monospace;
   justify-self: center;
   font-size: 0.75em;
+  user-select: none;
 `
 
 const Coordinates = styled.div``

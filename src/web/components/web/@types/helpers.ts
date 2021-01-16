@@ -1,3 +1,3 @@
-export function isLine(line: HTMLDivElement): line is LineElement {
-  return (line as LineElement).posY !== undefined
+export function isLine(line: Element): line is LineElement {
+  return line && (line as LineElement).posY !== undefined
 }

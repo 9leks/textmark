@@ -1,7 +1,6 @@
 import XTextArea from './x-textarea'
 
 export function handleKeyDown(this: XTextArea, e: KeyboardEvent): void {
-  console.log('hi')
   if (['Control', 'Alt', 'Meta', 'CapsLock', 'Shift'].includes(e.key)) {
     return
   }

@@ -5,7 +5,6 @@ import { handleKeyDown } from './keyhandler'
 
 export default class XTextArea extends LitElement {
   @internalProperty() protected lines: string[] = []
-  @internalProperty() private lineWidth: string = '0ch'
   @property() value = 'Hello, world!'
   @property({ attribute: 'font-size' }) fontSize = '16px'
   @property({ attribute: 'font-family' }) fontFamily = '"SF Mono", "Courier New", monospace'
@@ -18,8 +17,10 @@ export default class XTextArea extends LitElement {
   firstUpdated() {
     this.handleKeyDown = handleKeyDown.bind(this)
     this.lines = this.value.split('\n')
+
     this.shadowRoot.addEventListener('scroll', (e: Event) => this.handleScroll(e), true)
     this.shadowRoot.addEventListener('mousedown', (e: MouseEvent) => this.handleMouseDown(e))
+    document.addEventListener('mousemove', (e: MouseEvent) => this.handleMouseMove(e))
     document.addEventListener('keydown', this.handleKeyDown)
 
     const inputHandler = this.shadowRoot.querySelector<HTMLTextAreaElement>('.input')
@@ -28,23 +29,23 @@ export default class XTextArea extends LitElement {
   }
 
   disconnectedCallback() {
+    document.removeEventListener('mousemove', (e: MouseEvent) => this.handleMouseMove(e))
     document.removeEventListener('keydown', this.handleKeyDown)
     super.disconnectedCallback()
   }
 
   updated(props: Map<string, string | string[] | number>) {
-    this.lineWidth = `${this.lines.reduce((line, curr) => Math.max(line, curr.length), 0)}ch`
     this.shadowRoot.querySelector<HTMLSpanElement>('.caret')?.remove()
 
     const { x, y } = this
     const caret = document.createElement('span')
-    const parent = this.shadowRoot.querySelector<HTMLDivElement>('.document')
+    const textarea = this.shadowRoot.querySelector<HTMLDivElement>('.textarea')
     const height = Number(this.lineHeight.substring(0, 2))
 
     caret.className = 'caret'
     caret.style.left = `${x + 0.9}ch`
     caret.style.top = `${y * height}px`
-    parent.appendChild(caret)
+    textarea.appendChild(caret)
 
     if (['lines', 'y', 'x'].some((prop) => props.has(prop))) {
       this.sendChangeEvent()
@@ -63,7 +64,7 @@ export default class XTextArea extends LitElement {
 
   handleScroll(e: Event) {
     const el = e.target as HTMLDivElement
-    const className = el.classList.contains('numberline') ? '.document' : '.numberline'
+    const className = el.classList.contains('numberline') ? '.textarea' : '.numberline'
     const other = this.shadowRoot.querySelector<HTMLDivElement>(className)
     other.scrollTop = el.scrollTop
   }
@@ -82,7 +83,31 @@ export default class XTextArea extends LitElement {
     }
   }
 
-  handleInput(this: XTextArea, _e: InputEvent): void {
+  handleMouseMove(e: MouseEvent) {
+    const selection = this.shadowRoot.getSelection()
+
+    if (e.buttons !== 1 || !selection.toString()) {
+      return
+    }
+
+    const line = this.shadowRoot.elementFromPoint(e.clientX, e.clientY)
+    if (isLine(line)) {
+      this.x = selection.focusOffset
+      this.y = line.posY
+      return
+    }
+
+    if (e.target instanceof HTMLHtmlElement || e.target instanceof XTextArea) {
+      const height = Number(this.lineHeight.substring(0, 2))
+      const width = e.target.getBoundingClientRect().width
+      const y = Math.floor(e.clientY / height)
+
+      this.y = Math.max(Math.min(y, this.lines.length - 1), 0)
+      this.x = y > this.lines.length - 1 || e.clientX > width ? this.lines[this.y].length : 0
+    }
+  }
+
+  handleInput(_e: InputEvent): void {
     // TODO: handle composed characters
     const inputHandler = this.shadowRoot.querySelector<HTMLTextAreaElement>('.input')
     const input = inputHandler.value
@@ -93,24 +118,24 @@ export default class XTextArea extends LitElement {
     inputHandler.value = ''
     const { x, y, lines } = this
     this.lines = [...lines.slice(0, y), lines[y].slice(0, x) + input + lines[y].slice(x), ...lines.slice(y + 1)]
-    this.x = this.x + 1
+    this.x = x + 1
   }
 
   render() {
-    const { y, lines, fontSize, fontFamily, lineHeight, lineWidth } = this
+    const { y, lines, fontSize, fontFamily, lineHeight } = this
 
     return html`
       <div class="numberline">
         ${repeat(lines, (_, y) => {
           return html`
-            <div class="line">
+            <div class="line" .posY=${y}>
               <span>${y + 1}</span>
             </div>
           `
         })}
       </div>
 
-      <div class="document">
+      <div class="textarea">
         ${repeat(lines, (line, y) => {
           return html`
             <div class="line" .posY=${y}>
@@ -128,16 +153,16 @@ export default class XTextArea extends LitElement {
           font-family: ${fontFamily};
         }
 
-        .line {
-          min-height: ${lineHeight};
+        .textarea {
+          grid-auto-rows: ${lineHeight};
         }
 
-        .document .line {
-          width: ${lineWidth};
+        .textarea .line:nth-of-type(${y + 1}) {
+          background-color: #0001;
         }
 
-        .document .line:nth-of-type(${y + 1}) {
-          background: #0001;
+        .numberline .line {
+          height: ${lineHeight};
         }
 
         .numberline .line:nth-of-type(${y + 1}) {
@@ -158,7 +183,7 @@ export default class XTextArea extends LitElement {
         display: flex;
         flex: 1;
         flex-direction: row;
-        overflow-y: hidden;
+        overflow: hidden;
       }
 
       .numberline {
@@ -175,17 +200,19 @@ export default class XTextArea extends LitElement {
         overscroll-behavior: none;
       }
 
-      .document {
+      .textarea {
         position: relative;
         z-index: 0;
+        display: grid;
+        width: 100%;
         overflow: auto;
         white-space: nowrap;
+        cursor: text;
         overscroll-behavior: none;
       }
 
-      .document .line {
+      .textarea .line span {
         padding-left: 1ch;
-        cursor: text;
       }
 
       .line {
@@ -201,7 +228,7 @@ export default class XTextArea extends LitElement {
       .caret {
         position: absolute;
         z-index: -1;
-        background: #aaa;
+        background-color: #ff647e9f;
         animation: blink 1s step-end infinite;
       }
 
@@ -228,18 +255,18 @@ export default class XTextArea extends LitElement {
         display: none;
       }
 
-      .document::-webkit-scrollbar {
+      .textarea::-webkit-scrollbar {
         width: 0.75em;
         height: 0.75em;
-        background: transparent;
+        background-color: transparent;
       }
 
-      .document::-webkit-scrollbar-thumb {
-        background: #ddd;
+      .textarea::-webkit-scrollbar-thumb {
+        background-color: #ddd;
       }
 
-      .document::-webkit-scrollbar-thumb:hover {
-        background: #aaa;
+      .textarea::-webkit-scrollbar-thumb:hover {
+        background-color: #aaa;
       }
     `
   }
