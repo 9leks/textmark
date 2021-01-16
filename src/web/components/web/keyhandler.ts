@@ -1,28 +1,14 @@
 import XTextArea from './x-textarea'
 
-export function handleInput(this: XTextArea, _e: InputEvent): void {
-  const inputHandler = this.shadowRoot.querySelector<HTMLTextAreaElement>('#inputhandler')
-  const input = inputHandler.value
-
-  if (input.includes('\n')) {
-    return
-  }
-
-  inputHandler.value = ''
-  const { x, y, lines } = this
-
-  this.lines = [...lines.slice(0, y), lines[y].slice(0, x) + input + lines[y].slice(x), ...lines.slice(y + 1)]
-  this.x = this.x + 1
-}
-
 export function handleKeyDown(this: XTextArea, e: KeyboardEvent): void {
+  console.log('hi')
   if (['Control', 'Alt', 'Meta', 'CapsLock', 'Shift'].includes(e.key)) {
     return
   }
 
   if (!(window.api.os() === 'darwin' ? e.metaKey : e.ctrlKey)) {
-    const textArea = this.shadowRoot.querySelector<HTMLTextAreaElement>('#inputhandler')
-    textArea.focus()
+    const inputHandler = this.shadowRoot.querySelector<HTMLTextAreaElement>('.input')
+    inputHandler.focus({ preventScroll: true })
   }
 
   const { x, y, lines } = this

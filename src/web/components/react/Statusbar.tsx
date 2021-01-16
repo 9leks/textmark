@@ -8,9 +8,9 @@ const Statusbar: FunctionComponent = () => {
 
   return (
     <Container>
-      <span>
-        {x}:{y}
-      </span>
+      <Coordinates>
+        {x + 1}:{y + 1}
+      </Coordinates>
     </Container>
   )
 }
@@ -18,9 +18,14 @@ const Statusbar: FunctionComponent = () => {
 export default observer(Statusbar)
 
 const Container = styled.div`
-  padding: 0.25em 0.5em 0.25em 0.5em;
-  background-color: #0001;
+  display: flex;
+  justify-content: flex-end;
+  padding: 0.25em 1em;
+  background-color: #00000003;
   box-shadow: inset 0 0 2px #0003;
   font-family: 'SF Mono', 'Courier New', monospace;
   justify-self: center;
+  font-size: 0.75em;
 `
+
+const Coordinates = styled.div``
