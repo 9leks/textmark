@@ -27,9 +27,7 @@ export default class XTextArea extends LitElement {
   @property({ type: Number })
   y = 0
 
-  @property({ type: Number })
   getCharacterWidth: () => number
-
   setCaret: (x: number, y: number) => void
   handleKeyDown: (e: KeyboardEvent) => void
   handleInput: (e: InputEvent) => void
@@ -66,9 +64,11 @@ export default class XTextArea extends LitElement {
 
   firstUpdated(): void {
     const lines = this.shadowRoot.querySelector('#lines')
+    const numberline = this.shadowRoot.querySelector('#numberline')
 
     document.addEventListener('mouseup', (e: MouseEvent) => this.handleMouseUp(e))
     lines.addEventListener('scroll', (e: Event) => this.handleScroll(e))
+    numberline.addEventListener('wheel', (e: Event) => this.handleScroll(e))
     this.addEventListener('mousedown', this.handleMouseDown)
     this.addEventListener('mousemove', this.handleMouseMove)
     this.addEventListener('keydown', this.handleKeyDown)
@@ -85,18 +85,20 @@ export default class XTextArea extends LitElement {
   }
 
   render(): TemplateResult {
+    const { lines, maxChunkSize, y } = this
+
     return html`
       <div id="numberline">
-        ${this.lines.map((_, y: number) => html`<div class="line-number" ?app-focused=${y === this.y}>${y}</div>`)}
+        ${lines.map((_, y: number) => html`<div class="line-number" ?app-focused=${y === y}>${y}</div>`)}
       </div>
       <div id="lines">
-        ${this.lines.map((line, y) => {
-          const matcher = `(\\w{1,${this.maxChunkSize}}|\\s{1,${this.maxChunkSize}}|\\p{P}{1,${this.maxChunkSize}})`
+        ${lines.map((line, y) => {
+          const matcher = `(\\w{1,${maxChunkSize}}|\\s{1,${maxChunkSize}}|\\p{P}{1,${maxChunkSize}})`
           const chunks = line.match(new RegExp(matcher, 'gu'))
           const offsets = chunks?.reduce((acc, val, i) => [...acc, val.length + acc[i]], [0]) || []
 
           return html`
-            <div class="line" .app-offset-y=${y} ?app-focused=${y === this.y}>
+            <div class="line" .app-offset-y=${y} ?app-focused=${y === y}>
               ${chunks?.map((chunk, i) => {
                 return html`<span class="chunk" .app-offset-x=${offsets[i]}>${chunk}</span>`
               }) || html`<br />`}
@@ -123,9 +125,10 @@ export default class XTextArea extends LitElement {
   }
 
   handleScroll(e: Event): void {
-    const lines = e.target as HTMLDivElement
-    const numberline = this.shadowRoot.querySelector<HTMLDivElement>('#numberline')
-    numberline.scrollTop = lines.scrollTop
+    const el = e.target as HTMLDivElement
+    const other = this.shadowRoot.querySelector<HTMLDivElement>(el.id === 'lines' ? '#numberline' : '#lines')
+    console.log(el, other)
+    other.scrollTop = el.scrollTop
   }
 
   static styles = css`
